@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hệ Thống Báo Giá Thang Máy</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
   :root {
     --navy: #0d1b3e;
@@ -704,11 +706,8 @@
       </div>
     </div>
 
-    <button class="btn btn-primary" onclick="exportScript()">
-      📄 Xuất Script Tạo Hợp Đồng Word
-    </button>
-    <button class="btn btn-outline" onclick="copyJSON()">
-      📋 Copy JSON Dữ Liệu
+    <button class="btn btn-primary" id="btnExport" onclick="exportWordContract()">
+      📄 Xuất Hợp Đồng Word (.docx)
     </button>
     <button class="btn btn-outline" onclick="resetForm()">
       🔄 Làm Mới
@@ -889,36 +888,242 @@ function getContractData() {
   };
 }
 
-function exportScript() {
-  const data = getContractData();
-  const json = JSON.stringify(data, null, 2);
+async function exportWordContract() {
+  const btn = document.getElementById('btnExport');
+  btn.textContent = '⏳ Đang tạo hợp đồng...';
+  btn.disabled = true;
 
-  const script = `// ============================================================
-// SCRIPT TẠO HỢP ĐỒNG THANG MÁY
-// Chạy: node generate-contract.js
-// Yêu cầu: npm install docx
-// ============================================================
+  try {
+    const data = getContractData();
+    const {
+      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
+      AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign, HeadingLevel
+    } = docx;
 
-const contractData = ${json};
+    const fmtCur = n => Math.round(n).toLocaleString('vi-VN') + ' VNĐ';
 
-// Chạy: node generate-contract.js
-// File hợp đồng sẽ được tạo trong cùng thư mục
-`;
+    const NAVY = '0D1B3E', NAVY2 = '1A2F5E', GOLD = 'C9A84C', WHITE = 'FFFFFF';
+    const border = { style: BorderStyle.SINGLE, size: 1, color: 'AAAAAA' };
+    const borders = { top: border, bottom: border, left: border, right: border };
 
-  const blob = new Blob([script], { type: 'text/javascript' });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = `bao-gia-${(data.customerName || 'khach-hang').replace(/\s/g,'-')}.js`;
-  a.click();
+    const mkCell = (text, opts = {}) => new TableCell({
+      borders,
+      width: opts.w ? { size: opts.w, type: WidthType.DXA } : undefined,
+      shading: opts.bg ? { fill: opts.bg, type: ShadingType.CLEAR } : undefined,
+      margins: { top: 80, bottom: 80, left: 120, right: 120 },
+      verticalAlign: VerticalAlign.CENTER,
+      children: [new Paragraph({
+        alignment: opts.align || AlignmentType.LEFT,
+        children: [new TextRun({
+          text: String(text ?? ''),
+          bold: opts.bold || false,
+          size: opts.size || 20,
+          font: 'Times New Roman',
+          color: opts.color || '000000',
+        })]
+      })]
+    });
 
-  showToast('📄 Đã xuất script! Chạy: node generate-contract.js');
-}
+    const mkP = (text, opts = {}) => new Paragraph({
+      alignment: opts.align || AlignmentType.LEFT,
+      spacing: { before: opts.before || 60, after: opts.after || 60 },
+      border: opts.borderBottom ? { bottom: { style: BorderStyle.SINGLE, size: 6, color: NAVY2, space: 1 } } : undefined,
+      children: [new TextRun({
+        text: String(text ?? ''),
+        bold: opts.bold || false,
+        italics: opts.italic || false,
+        size: opts.size || 22,
+        font: 'Times New Roman',
+        color: opts.color || '000000',
+        allCaps: opts.caps || false,
+      })]
+    });
 
-function copyJSON() {
-  const data = getContractData();
-  navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-  showToast('📋 Đã copy JSON dữ liệu!');
+    const secTitle = (text) => [
+      mkP(text, { bold: true, size: 24, color: NAVY2, caps: true, before: 200, after: 0 }),
+      mkP('', { borderBottom: true, before: 0, after: 120 }),
+    ];
+
+    // ── HEADER ──
+    const header = [
+      mkP('CÔNG TY CỔ PHẦN THANG MÁY VIỆT NAM', { bold: true, size: 30, color: NAVY, align: AlignmentType.CENTER, before: 0, after: 40 }),
+      mkP('VIETNAM ELEVATOR CORPORATION', { bold: true, size: 20, color: NAVY2, align: AlignmentType.CENTER, after: 40 }),
+      mkP('Địa chỉ: Số 123, Đường Nguyễn Văn Linh, TP. Hà Nội  |  Tel: 024.1234.5678', { size: 18, color: '555555', align: AlignmentType.CENTER, after: 60 }),
+      mkP('', { borderBottom: true, before: 0, after: 160 }),
+      mkP('HỢP ĐỒNG CUNG CẤP VÀ LẮP ĐẶT THANG MÁY', { bold: true, size: 28, color: NAVY, align: AlignmentType.CENTER, before: 0, after: 60 }),
+      mkP(`Số hợp đồng: ${data.contractNumber}`, { bold: true, size: 22, align: AlignmentType.CENTER, after: 40 }),
+      mkP(`Ngày: ${data.contractDate}`, { size: 20, italic: true, align: AlignmentType.CENTER, after: 200 }),
+    ];
+
+    // ── ĐIỀU 1: CÁC BÊN ──
+    const parties = [
+      ...secTitle('Điều 1: Các Bên Tham Gia Hợp Đồng'),
+      mkP('BÊN A (BÊN CUNG CẤP & LẮP ĐẶT):', { bold: true, color: NAVY2 }),
+      mkP('Công ty Cổ phần Thang Máy Việt Nam', { bold: true }),
+      mkP('Địa chỉ: Số 123, Đường Nguyễn Văn Linh, Quận Hoàng Mai, TP. Hà Nội'),
+      mkP('Mã số thuế: 0123456789  |  Đại diện: Ông Nguyễn Văn A - Giám đốc'),
+      mkP('Điện thoại: 024.1234.5678  |  Email: info@thangmayvn.com'),
+      mkP(''),
+      mkP('BÊN B (BÊN MUA):', { bold: true, color: NAVY2 }),
+      mkP(`Tên khách hàng / Công ty: ${data.customerName}`, { bold: true }),
+      mkP(`Địa chỉ: ${data.customerAddress}`),
+      ...(data.customerTaxCode ? [mkP(`Mã số thuế: ${data.customerTaxCode}`)] : []),
+      ...(data.customerRepresentative ? [mkP(`Đại diện: ${data.customerRepresentative}`)] : []),
+      mkP(`Điện thoại: ${data.customerPhone}`),
+      mkP(''),
+      mkP('Hai bên thống nhất ký kết hợp đồng với các điều khoản sau:', { italic: true }),
+      mkP(''),
+    ];
+
+    // ── ĐIỀU 2: THÔNG SỐ KỸ THUẬT ──
+    const specTable = new Table({
+      width: { size: 9200, type: WidthType.DXA },
+      columnWidths: [3400, 5800],
+      rows: [
+        new TableRow({ children: [mkCell('THÔNG SỐ KỸ THUẬT THANG MÁY', { w: 9200, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }), mkCell('', { w: 0 })] }),
+        new TableRow({ children: [mkCell('Loại thang máy', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.elevatorType, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Model / Nhãn hiệu', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.elevatorModel, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Tải trọng', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.capacity} kg`, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Số tầng dừng', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.floors} tầng`, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Tốc độ thang', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.speed} m/s`, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Loại cửa', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.doorType, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Vật liệu cabin', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.cabinMaterial, { w: 5800 })] }),
+        new TableRow({ children: [mkCell('Tính năng đặc biệt', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.features.join(', '), { w: 5800 })] }),
+      ]
+    });
+
+    const specs = [
+      ...secTitle('Điều 2: Thông Số Kỹ Thuật Thang Máy'),
+      specTable,
+      mkP(''),
+    ];
+
+    // ── ĐIỀU 3: GIÁ ──
+    const priceTable = new Table({
+      width: { size: 9200, type: WidthType.DXA },
+      columnWidths: [4800, 2000, 2400],
+      rows: [
+        new TableRow({ children: [
+          mkCell('HẠNG MỤC', { w: 4800, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
+          mkCell('ĐƠN VỊ', { w: 2000, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
+          mkCell('THÀNH TIỀN', { w: 2400, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
+        ]}),
+        new TableRow({ children: [mkCell('Giá thiết bị thang máy', { w: 4800 }), mkCell('1 bộ', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.basePrice), { w: 2400, align: AlignmentType.RIGHT })] }),
+        new TableRow({ children: [mkCell('Chi phí lắp đặt & vận hành thử', { w: 4800 }), mkCell('Trọn gói', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.installationFee), { w: 2400, align: AlignmentType.RIGHT })] }),
+        new TableRow({ children: [mkCell(`Bảo trì định kỳ (${data.maintenanceMonths} tháng)`, { w: 4800 }), mkCell('Trọn gói', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.maintenanceFee), { w: 2400, align: AlignmentType.RIGHT })] }),
+        ...(data.discount > 0 ? [new TableRow({ children: [mkCell('Chiết khấu / Giảm giá', { w: 4800, color: 'C00000' }), mkCell('', { w: 2000 }), mkCell(`- ${fmtCur(data.discount)}`, { w: 2400, color: 'C00000', align: AlignmentType.RIGHT })] })] : []),
+        new TableRow({ children: [mkCell('Tổng cộng (chưa VAT)', { w: 4800, bg: 'DEEAF1', bold: true }), mkCell('', { w: 2000, bg: 'DEEAF1' }), mkCell(fmtCur(data.totalPrice), { w: 2400, bg: 'DEEAF1', bold: true, align: AlignmentType.RIGHT })] }),
+        new TableRow({ children: [mkCell('Thuế VAT (10%)', { w: 4800 }), mkCell('10%', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.vatAmount), { w: 2400, align: AlignmentType.RIGHT })] }),
+        new TableRow({ children: [mkCell('TỔNG GIÁ TRỊ HỢP ĐỒNG', { w: 4800, bg: NAVY2, bold: true, color: WHITE }), mkCell('', { w: 2000, bg: NAVY2 }), mkCell(fmtCur(data.grandTotal), { w: 2400, bg: NAVY2, bold: true, color: 'FFFF00', align: AlignmentType.RIGHT })] }),
+      ]
+    });
+
+    const pricing = [
+      ...secTitle('Điều 3: Giá Trị Hợp Đồng và Phương Thức Thanh Toán'),
+      priceTable,
+      mkP(''),
+      mkP('Phương thức thanh toán:', { bold: true }),
+      ...data.paymentSchedule.map((s, i) => mkP(`  • Đợt ${i + 1}: ${s.percent}% = ${fmtCur(s.amount)} — ${s.condition}`)),
+      mkP(''),
+      mkP('Hình thức: Chuyển khoản — STK: 0123456789 - BIDV - Chi nhánh Hà Nội', { italic: true }),
+      mkP(''),
+    ];
+
+    // ── ĐIỀU 4-6: ĐIỀU KHOẢN ──
+    const terms = [
+      ...secTitle('Điều 4: Thời Gian Thực Hiện'),
+      mkP(`• Thời gian giao hàng và lắp đặt: ${data.deliveryDays} ngày làm việc kể từ ngày ký hợp đồng và nhận đặt cọc.`),
+      mkP(`• Bảo hành thiết bị: ${data.warrantyMonths} tháng kể từ ngày nghiệm thu.`),
+      mkP(`• Bảo trì miễn phí: ${data.maintenanceMonths} tháng đầu, định kỳ theo lịch thỏa thuận.`),
+      mkP(''),
+      ...secTitle('Điều 5: Nghĩa Vụ Các Bên'),
+      mkP('Bên A có trách nhiệm:', { bold: true }),
+      mkP('• Cung cấp thang máy đúng thông số kỹ thuật đã ký kết.'),
+      mkP('• Lắp đặt, vận hành thử và bàn giao đúng thời hạn.'),
+      mkP('• Hỗ trợ kỹ thuật và bảo hành trong suốt thời gian hợp đồng.'),
+      mkP(''),
+      mkP('Bên B có trách nhiệm:', { bold: true }),
+      mkP('• Thanh toán đúng hạn theo lịch đã thỏa thuận.'),
+      mkP('• Chuẩn bị mặt bằng (hố thang, phòng máy) theo bản vẽ kỹ thuật của Bên A.'),
+      mkP('• Không tự ý sửa chữa, thay thế linh kiện trong thời gian bảo hành.'),
+      mkP(''),
+      ...secTitle('Điều 6: Điều Khoản Chung'),
+      mkP('• Hợp đồng có hiệu lực từ ngày ký, có giá trị pháp lý với cả hai bên.'),
+      mkP('• Mọi tranh chấp giải quyết bằng thương lượng, nếu không thỏa thuận được thì đưa ra Tòa án có thẩm quyền tại Hà Nội.'),
+      mkP('• Hợp đồng lập thành 02 bản, mỗi bên giữ 01 bản có giá trị pháp lý như nhau.'),
+      mkP(''),
+    ];
+
+    // ── KÝ KẾT ──
+    const signTable = new Table({
+      width: { size: 9200, type: WidthType.DXA },
+      columnWidths: [4600, 4600],
+      rows: [
+        new TableRow({ children: [
+          mkCell('ĐẠI DIỆN BÊN A', { w: 4600, bold: true, align: AlignmentType.CENTER, bg: 'DEEAF1' }),
+          mkCell('ĐẠI DIỆN BÊN B', { w: 4600, bold: true, align: AlignmentType.CENTER, bg: 'DEEAF1' }),
+        ]}),
+        new TableRow({ children: [
+          mkCell('(Ký, đóng dấu)', { w: 4600, align: AlignmentType.CENTER, italic: true }),
+          mkCell('(Ký, đóng dấu)', { w: 4600, align: AlignmentType.CENTER, italic: true }),
+        ]}),
+        new TableRow({ children: [
+          new TableCell({
+            borders, width: { size: 4600, type: WidthType.DXA },
+            margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            children: [
+              new Paragraph({ spacing: { before: 0, after: 1800 }, children: [new TextRun('')] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Nguyễn Văn A - Giám đốc', bold: true, font: 'Times New Roman', size: 20 })] }),
+            ]
+          }),
+          new TableCell({
+            borders, width: { size: 4600, type: WidthType.DXA },
+            margins: { top: 80, bottom: 80, left: 120, right: 120 },
+            children: [
+              new Paragraph({ spacing: { before: 0, after: 1800 }, children: [new TextRun('')] }),
+              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: data.customerRepresentative || data.customerName, bold: true, font: 'Times New Roman', size: 20 })] }),
+            ]
+          }),
+        ]}),
+      ]
+    });
+
+    const signing = [
+      ...secTitle('Chữ Ký Xác Nhận'),
+      mkP(`Hà Nội, ngày ${data.contractDate}`, { align: AlignmentType.RIGHT, italic: true }),
+      mkP(''),
+      signTable,
+      mkP(''),
+      mkP(`Người lập: ${data.salesPerson}  |  ĐT: ${data.salesPhone}`, { italic: true, size: 18, color: '888888' }),
+    ];
+
+    const doc = new Document({
+      styles: {
+        default: { document: { run: { font: 'Times New Roman', size: 22 } } }
+      },
+      sections: [{
+        properties: {
+          page: {
+            size: { width: 11906, height: 16838 },
+            margin: { top: 1134, right: 850, bottom: 1134, left: 1700 }
+          }
+        },
+        children: [...header, ...parties, ...specs, ...pricing, ...terms, ...signing]
+      }]
+    });
+
+    const blob = await Packer.toBlob(doc);
+    const filename = `HopDong_${data.contractNumber.replace(/\//g,'_')}_${data.customerName.replace(/\s+/g,'_')}.docx`;
+    saveAs(blob, filename);
+    showToast('✅ Đã tải hợp đồng Word thành công!');
+
+  } catch (err) {
+    console.error(err);
+    showToast('❌ Lỗi: ' + err.message);
+  }
+
+  btn.textContent = '📄 Xuất Hợp Đồng Word (.docx)';
+  btn.disabled = false;
 }
 
 function resetForm() {
