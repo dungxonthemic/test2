@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Hệ Thống Báo Giá Thang Máy</title>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/docx/8.5.0/docx.umd.min.js"></script>
+<script src="https://unpkg.com/docx@7.8.2/build/index.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
 <style>
   :root {
@@ -894,11 +894,16 @@ async function exportWordContract() {
   btn.disabled = true;
 
   try {
+    // Kiểm tra thư viện đã load chưa
+    if (typeof window.docx === 'undefined') {
+      throw new Error('Thư viện docx chưa load xong, vui lòng thử lại sau vài giây.');
+    }
+
     const data = getContractData();
     const {
       Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-      AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign, HeadingLevel
-    } = docx;
+      AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign
+    } = window.docx;
 
     const fmtCur = n => Math.round(n).toLocaleString('vi-VN') + ' VNĐ';
 
