@@ -3,1166 +3,708 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Hệ Thống Báo Giá Thang Máy</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<script src="docx.min.js"></script>
+<title>Công cụ Báo Giá Thang Máy – D-Tech Solutions</title>
+<script src="pizzip.min.js"></script>
+<script src="docxtemplater.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --navy: #0d1b3e;
-    --navy-mid: #1a2f5e;
-    --gold: #c9a84c;
-    --gold-light: #e8c97a;
-    --silver: #8a9bb0;
-    --bg: #f4f6fa;
-    --white: #ffffff;
-    --text: #1a2540;
-    --muted: #6b7a99;
-    --success: #1a7a4a;
-    --danger: #c0392b;
-    --border: #dde3f0;
-    --card-shadow: 0 4px 24px rgba(13,27,62,0.08);
-  }
+:root {
+  --red: #c0392b;
+  --red-dark: #96281b;
+  --red-light: #f5e6e4;
+  --navy: #1a2540;
+  --navy-light: #2c3e6b;
+  --gold: #d4a017;
+  --bg: #f7f8fc;
+  --white: #ffffff;
+  --border: #e2e8f0;
+  --text: #1e293b;
+  --muted: #64748b;
+  --shadow: 0 2px 16px rgba(26,37,64,0.08);
+  --shadow-lg: 0 8px 40px rgba(26,37,64,0.14);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Be Vietnam Pro', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
 
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+/* ── HEADER ── */
+.header {
+  background: linear-gradient(120deg, var(--navy) 0%, var(--navy-light) 100%);
+  padding: 20px 40px;
+  display: flex; align-items: center; gap: 16px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+}
+.header-logo {
+  width: 48px; height: 48px;
+  background: var(--red);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 22px; flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(192,57,43,0.4);
+}
+.header h1 { color: white; font-size: 20px; font-weight: 700; }
+.header p { color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 2px; }
+.header-right { margin-left: auto; color: rgba(255,255,255,0.4); font-size: 12px; text-align: right; }
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    min-height: 100vh;
-  }
+/* ── LAYOUT ── */
+.layout {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 32px 32px 60px;
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 28px;
+  align-items: start;
+}
 
-  /* Header */
-  .header {
-    background: linear-gradient(135deg, var(--navy) 0%, var(--navy-mid) 60%, #0f2d60 100%);
-    color: white;
-    padding: 0;
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 300px; height: 300px;
-    background: radial-gradient(circle, rgba(201,168,76,0.15) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-  .header::after {
-    content: '';
-    position: absolute;
-    bottom: -40px; left: 20%;
-    width: 200px; height: 200px;
-    background: radial-gradient(circle, rgba(201,168,76,0.08) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-  .header-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 36px 40px 32px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    position: relative;
-    z-index: 1;
-  }
-  .logo-icon {
-    width: 64px; height: 64px;
-    background: linear-gradient(135deg, var(--gold), var(--gold-light));
-    border-radius: 16px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 28px;
-    box-shadow: 0 4px 16px rgba(201,168,76,0.4);
-    flex-shrink: 0;
-  }
-  .header-text h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: 28px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-  }
-  .header-text p {
-    font-size: 14px;
-    color: rgba(255,255,255,0.65);
-    margin-top: 4px;
-    font-weight: 300;
-  }
-  .header-badge {
-    margin-left: auto;
-    background: rgba(201,168,76,0.15);
-    border: 1px solid rgba(201,168,76,0.3);
-    color: var(--gold-light);
-    padding: 8px 18px;
-    border-radius: 100px;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-  }
+/* ── CARD ── */
+.card {
+  background: var(--white);
+  border-radius: 14px;
+  box-shadow: var(--shadow);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+.card-head {
+  padding: 14px 20px;
+  background: var(--navy);
+  display: flex; align-items: center; gap: 10px;
+}
+.card-head span { font-size: 16px; }
+.card-head h3 { color: white; font-size: 14px; font-weight: 600; letter-spacing: 0.3px; }
+.card-body { padding: 20px; }
 
-  /* Layout */
-  .main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 36px 40px 60px;
-    display: grid;
-    grid-template-columns: 1fr 400px;
-    gap: 28px;
-    align-items: start;
-  }
+/* ── FORM ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
+.full { grid-column: 1 / -1; }
+.field { display: flex; flex-direction: column; gap: 5px; }
+label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; }
+input, select {
+  padding: 9px 12px;
+  border: 1.5px solid var(--border);
+  border-radius: 8px;
+  font-family: inherit; font-size: 14px; color: var(--text);
+  background: #fafbfd;
+  transition: all 0.18s;
+  outline: none;
+}
+input:focus, select:focus {
+  border-color: var(--red);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(192,57,43,0.08);
+}
+.hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
 
-  /* Cards */
-  .card {
-    background: var(--white);
-    border-radius: 16px;
-    box-shadow: var(--card-shadow);
-    overflow: hidden;
-    margin-bottom: 24px;
-  }
-  .card-header {
-    background: linear-gradient(90deg, var(--navy) 0%, var(--navy-mid) 100%);
-    color: white;
-    padding: 14px 24px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .card-header .icon { font-size: 18px; }
-  .card-header h3 { font-family: 'Playfair Display', serif; font-size: 16px; font-weight: 700; }
-  .card-body { padding: 24px; }
+/* ── SLIDER ── */
+.slider-wrap { display: flex; flex-direction: column; gap: 6px; }
+.slider-val {
+  font-size: 26px; font-weight: 800; color: var(--navy); text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.slider-val small { font-size: 14px; font-weight: 400; color: var(--muted); }
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  height: 5px; border-radius: 3px;
+  background: linear-gradient(90deg, var(--red) var(--pct,20%), var(--border) var(--pct,20%));
+  border: none; padding: 0; background-color: transparent;
+  cursor: pointer;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px; height: 18px; border-radius: 50%;
+  background: var(--navy); border: 3px solid white;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
+.slider-ticks { display: flex; justify-content: space-between; font-size: 10px; color: var(--muted); }
 
-  /* Form */
-  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-  .form-group { display: flex; flex-direction: column; gap: 6px; }
-  .form-group.full { grid-column: 1 / -1; }
-  label { font-size: 12px; font-weight: 600; color: var(--muted); letter-spacing: 0.5px; text-transform: uppercase; }
-  input, select, textarea {
-    width: 100%;
-    padding: 11px 14px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: var(--text);
-    background: #fafbfd;
-    transition: all 0.2s;
-    outline: none;
-  }
-  input:focus, select:focus, textarea:focus {
-    border-color: var(--navy-mid);
-    background: white;
-    box-shadow: 0 0 0 3px rgba(26,47,94,0.07);
-  }
-  input[type="number"] { -moz-appearance: textfield; }
+/* ── PRICING TABLE ── */
+.bảng-giá { width: 100%; border-collapse: collapse; font-size: 13px; }
+.bảng-giá th {
+  background: var(--navy); color: white;
+  padding: 8px 12px; text-align: left; font-weight: 600; font-size: 12px;
+}
+.bảng-giá th:last-child { text-align: right; }
+.bảng-giá td { padding: 8px 12px; border-bottom: 1px solid var(--border); }
+.bảng-giá td:last-child { text-align: right; font-weight: 600; }
+.bảng-giá tr.subtotal td { background: #f0f4ff; font-weight: 600; }
+.bảng-giá tr.total td { background: var(--navy); color: white; font-weight: 700; font-size: 14px; }
+.bảng-giá tr.discount td { color: var(--red); }
 
-  /* Elevator type cards */
-  .elevator-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-  }
-  .elev-card {
-    border: 2px solid var(--border);
-    border-radius: 12px;
-    padding: 14px 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-    text-align: center;
-    background: #fafbfd;
-  }
-  .elev-card:hover { border-color: var(--navy-mid); background: white; }
-  .elev-card.active {
-    border-color: var(--gold);
-    background: linear-gradient(135deg, #fdf9ee, #fffdf5);
-    box-shadow: 0 2px 12px rgba(201,168,76,0.2);
-  }
-  .elev-card .emoji { font-size: 28px; margin-bottom: 6px; display: block; }
-  .elev-card .name { font-size: 12px; font-weight: 600; color: var(--text); }
-  .elev-card .price-hint { font-size: 11px; color: var(--muted); margin-top: 3px; }
+/* ── SPECS PREVIEW ── */
+.specs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.spec-item {
+  background: var(--bg); border-radius: 8px; padding: 8px 12px;
+  display: flex; flex-direction: column; gap: 2px;
+}
+.spec-label { font-size: 10px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; font-weight: 600; }
+.spec-val { font-size: 14px; font-weight: 700; color: var(--navy); }
 
-  /* Range slider */
-  .range-wrap { display: flex; flex-direction: column; gap: 8px; }
-  .range-labels { display: flex; justify-content: space-between; font-size: 11px; color: var(--muted); }
-  .range-value {
-    text-align: center;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--navy);
-    font-family: 'Playfair Display', serif;
-  }
-  .range-unit { font-size: 14px; font-weight: 400; color: var(--muted); }
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    height: 6px;
-    border-radius: 3px;
-    background: linear-gradient(90deg, var(--navy-mid) var(--val, 30%), var(--border) var(--val, 30%));
-    border: none;
-    box-shadow: none;
-    padding: 0;
-    cursor: pointer;
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 20px; height: 20px;
-    border-radius: 50%;
-    background: var(--navy);
-    border: 3px solid white;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.25);
-    cursor: pointer;
-  }
+/* ── RIGHT PANEL ── */
+.panel {
+  position: sticky; top: 24px;
+}
+.summary-card {
+  background: var(--navy);
+  border-radius: 16px;
+  padding: 24px;
+  color: white;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 16px;
+}
+.summary-card h3 { font-size: 16px; font-weight: 700; color: #a0aec0; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 18px; }
+.sum-row { display: flex; justify-content: space-between; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 13px; }
+.sum-row .lbl { color: rgba(255,255,255,0.6); }
+.sum-row .val { font-weight: 600; }
+.sum-row.disc .val { color: #68d391; }
+.sum-total {
+  margin-top: 14px; padding-top: 14px;
+  border-top: 1px solid rgba(192,57,43,0.4);
+  display: flex; justify-content: space-between; align-items: center;
+}
+.sum-total .lbl { font-size: 13px; color: #fc8181; font-weight: 600; }
+.sum-total .val { font-size: 24px; font-weight: 800; color: #fc8181; }
+.payment-list { margin-top: 18px; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.07); }
+.payment-list h4 { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.4); margin-bottom: 10px; }
+.pay-item { display: flex; align-items: center; gap: 8px; padding: 6px 10px; background: rgba(255,255,255,0.04); border-radius: 7px; margin-bottom: 5px; font-size: 12px; }
+.pay-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--red); flex-shrink: 0; }
+.pay-cond { flex: 1; color: rgba(255,255,255,0.55); }
+.pay-amt { font-weight: 700; color: white; }
 
-  /* Checkboxes */
-  .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-  .feature-item {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    padding: 9px 12px;
-    border: 1.5px solid var(--border);
-    border-radius: 10px;
-    cursor: pointer;
-    transition: all 0.2s;
-    background: #fafbfd;
-  }
-  .feature-item:hover { border-color: var(--navy-mid); background: white; }
-  .feature-item input[type="checkbox"] {
-    width: 16px; height: 16px;
-    accent-color: var(--navy);
-    flex-shrink: 0;
-    padding: 0; margin: 0;
-    border: none; border-radius: 4px;
-  }
-  .feature-item span { font-size: 13px; font-weight: 500; }
-  .feature-item .cost { margin-left: auto; font-size: 11px; color: var(--gold); font-weight: 600; }
+/* ── BUTTONS ── */
+.btn {
+  width: 100%; padding: 13px; border-radius: 10px;
+  font-family: inherit; font-size: 14px; font-weight: 700;
+  cursor: pointer; border: none; transition: all 0.18s;
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 10px;
+}
+.btn-primary {
+  background: var(--red);
+  color: white;
+  box-shadow: 0 4px 14px rgba(192,57,43,0.35);
+}
+.btn-primary:hover:not(:disabled) { background: var(--red-dark); transform: translateY(-1px); box-shadow: 0 6px 18px rgba(192,57,43,0.45); }
+.btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-outline { background: transparent; color: var(--navy); border: 2px solid var(--border); }
+.btn-outline:hover { border-color: var(--navy); background: var(--bg); }
 
-  /* Right panel - Price summary */
-  .price-panel {
-    position: sticky;
-    top: 24px;
-  }
-  .price-card {
-    background: linear-gradient(160deg, var(--navy) 0%, #0a1630 100%);
-    border-radius: 20px;
-    padding: 28px;
-    color: white;
-    box-shadow: 0 8px 40px rgba(13,27,62,0.25);
-    margin-bottom: 20px;
-  }
-  .price-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 18px;
-    margin-bottom: 4px;
-    color: var(--gold-light);
-  }
-  .price-card .subtitle { font-size: 12px; color: rgba(255,255,255,0.5); margin-bottom: 24px; }
+/* ── TOAST ── */
+.toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1a7a4a; color: white;
+  padding: 12px 28px; border-radius: 100px;
+  font-weight: 600; font-size: 14px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  transition: transform 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  z-index: 999; white-space: nowrap;
+}
+.toast.error { background: #c0392b; }
+.toast.show { transform: translateX(-50%) translateY(0); }
 
-  .price-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.07);
-    font-size: 13px;
-  }
-  .price-row:last-of-type { border-bottom: none; }
-  .price-row .label { color: rgba(255,255,255,0.65); }
-  .price-row .value { font-weight: 600; text-align: right; }
-  .price-row.total-row {
-    margin-top: 12px;
-    padding-top: 16px;
-    border-top: 1px solid rgba(201,168,76,0.3);
-    border-bottom: none;
-  }
-  .price-row.total-row .label { font-size: 14px; font-weight: 600; color: var(--gold-light); }
-  .price-row.total-row .value { font-size: 22px; font-family: 'Playfair Display', serif; color: var(--gold-light); }
-  .price-row .discount { color: #7ad4a0; }
+/* ── DIVIDER ── */
+.divider { height: 1px; background: var(--border); margin: 16px 0; }
 
-  .payment-schedule {
-    margin-top: 18px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255,255,255,0.07);
-  }
-  .payment-schedule h4 { font-size: 12px; text-transform: uppercase; letter-spacing: 1px; color: rgba(255,255,255,0.5); margin-bottom: 12px; }
-  .payment-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 7px 10px;
-    background: rgba(255,255,255,0.05);
-    border-radius: 8px;
-    margin-bottom: 6px;
-    font-size: 12px;
-  }
-  .payment-item .dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--gold);
-    flex-shrink: 0;
-    margin-right: 8px;
-  }
-  .payment-item .cond { color: rgba(255,255,255,0.6); flex: 1; }
-  .payment-item .amt { font-weight: 600; color: white; }
-
-  /* Buttons */
-  .btn {
-    width: 100%;
-    padding: 14px;
-    border-radius: 12px;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 8px;
-  }
-  .btn-primary {
-    background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
-    color: var(--navy);
-    box-shadow: 0 4px 16px rgba(201,168,76,0.35);
-    margin-bottom: 12px;
-  }
-  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(201,168,76,0.45); }
-  .btn-outline {
-    background: transparent;
-    color: var(--navy);
-    border: 2px solid var(--border);
-    margin-bottom: 12px;
-  }
-  .btn-outline:hover { border-color: var(--navy-mid); background: var(--bg); }
-
-  /* Contract info section */
-  .contract-info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-
-  /* Toast notification */
-  .toast {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%) translateY(80px);
-    background: var(--success);
-    color: white;
-    padding: 14px 28px;
-    border-radius: 100px;
-    font-weight: 600;
-    font-size: 14px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.2);
-    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    z-index: 1000;
-    white-space: nowrap;
-  }
-  .toast.show { transform: translateX(-50%) translateY(0); }
-
-  /* Divider */
-  .section-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 20px 0;
-  }
-
-  @media (max-width: 900px) {
-    .main { grid-template-columns: 1fr; padding: 20px; }
-    .elevator-grid { grid-template-columns: repeat(2, 1fr); }
-    .form-grid { grid-template-columns: 1fr; }
-    .price-panel { position: static; }
-  }
+@media (max-width: 960px) {
+  .layout { grid-template-columns: 1fr; padding: 16px; }
+  .panel { position: static; }
+  .grid3 { grid-template-columns: 1fr 1fr; }
+}
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-inner">
-    <div class="logo-icon">🏢</div>
-    <div class="header-text">
-      <h1>Hệ Thống Báo Giá Thang Máy</h1>
-      <p>Công ty Cổ phần Thang Máy Việt Nam — Tính giá & Xuất hợp đồng tự động</p>
-    </div>
-    <div class="header-badge">PRO TOOL</div>
+  <div class="header-logo">🏢</div>
+  <div>
+    <h1>Công Cụ Báo Giá & Hợp Đồng Thang Máy</h1>
+    <p>D-Tech Solutions VINA – Tự động tính toán và xuất hợp đồng</p>
+  </div>
+  <div class="header-right">
+    <div>Phiên bản 2.0</div>
+    <div id="currentDate"></div>
   </div>
 </div>
 
-<div class="main">
-  <!-- Left: Form -->
-  <div class="form-area">
+<div class="layout">
+<!-- ═══════════════ LEFT COLUMN ═══════════════ -->
+<div>
 
-    <!-- Loại thang -->
-    <div class="card">
-      <div class="card-header">
-        <span class="icon">🏗️</span>
-        <h3>Loại Thang Máy</h3>
+<!-- THÔNG TIN KHÁCH HÀNG -->
+<div class="card">
+  <div class="card-head"><span>👤</span><h3>Thông Tin Khách Hàng & Công Trình</h3></div>
+  <div class="card-body">
+    <div class="grid2">
+      <div class="field full">
+        <label>Tên khách hàng / Công ty *</label>
+        <input id="tenKhach" type="text" placeholder="Ông/Bà Nguyễn Văn A hoặc Công ty ABC" oninput="update()">
       </div>
-      <div class="card-body">
-        <div class="elevator-grid" id="elevatorTypes">
-          <div class="elev-card active" data-type="passenger" data-base="200000000" onclick="selectElevator(this)">
-            <span class="emoji">🧑‍🤝‍🧑</span>
-            <div class="name">Tải Khách</div>
-            <div class="price-hint">Từ 200 triệu</div>
-          </div>
-          <div class="elev-card" data-type="freight" data-base="280000000" onclick="selectElevator(this)">
-            <span class="emoji">📦</span>
-            <div class="name">Tải Hàng</div>
-            <div class="price-hint">Từ 280 triệu</div>
-          </div>
-          <div class="elev-card" data-type="hospital" data-base="350000000" onclick="selectElevator(this)">
-            <span class="emoji">🏥</span>
-            <div class="name">Bệnh Viện</div>
-            <div class="price-hint">Từ 350 triệu</div>
-          </div>
-          <div class="elev-card" data-type="panoramic" data-base="420000000" onclick="selectElevator(this)">
-            <span class="emoji">🪟</span>
-            <div class="name">Panoramic</div>
-            <div class="price-hint">Từ 420 triệu</div>
-          </div>
-          <div class="elev-card" data-type="home" data-base="120000000" onclick="selectElevator(this)">
-            <span class="emoji">🏠</span>
-            <div class="name">Gia Đình</div>
-            <div class="price-hint">Từ 120 triệu</div>
-          </div>
-          <div class="elev-card" data-type="escalator" data-base="180000000" onclick="selectElevator(this)">
-            <span class="emoji">🚶</span>
-            <div class="name">Thang Cuốn</div>
-            <div class="price-hint">Từ 180 triệu</div>
-          </div>
-        </div>
-
-        <div class="section-divider"></div>
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Model / Nhãn hiệu</label>
-            <input type="text" id="elevModel" value="FUJI FJ-P1000" placeholder="VD: FUJI, OTIS, MITSUBISHI...">
-          </div>
-          <div class="form-group">
-            <label>Loại cửa</label>
-            <select id="doorType" onchange="calculate()">
-              <option value="0" data-add="0">Cửa 2 cánh mở giữa - Inox (Tiêu chuẩn)</option>
-              <option value="1" data-add="15000000">Cửa 2 cánh mở giữa - Kính cường lực (+15 tr)</option>
-              <option value="2" data-add="8000000">Cửa 1 cánh mở lề (+8 tr)</option>
-              <option value="3" data-add="25000000">Cửa 4 cánh - Panoramic (+25 tr)</option>
-            </select>
-          </div>
-        </div>
+      <div class="field full">
+        <label>Địa chỉ *</label>
+        <input id="diaChi" type="text" placeholder="Số nhà, Đường, Phường/Xã, Tỉnh/TP" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Điện thoại *</label>
+        <input id="dienThoai" type="text" placeholder="0912 345 678" oninput="update()">
+      </div>
+      <div class="field">
+        <label>CCCD / Mã số thuế</label>
+        <input id="cccd" type="text" placeholder="123456789012" oninput="update()">
+      </div>
+      <div class="field full">
+        <label>Người đại diện ký hợp đồng</label>
+        <input id="nguoiDaiDien" type="text" placeholder="Nguyễn Văn A" oninput="update()">
+      </div>
+      <div class="field full"><div class="divider"></div></div>
+      <div class="field full">
+        <label>Tên công trình *</label>
+        <input id="tenCongTrinh" type="text" placeholder="Nhà ở gia đình, Tòa nhà văn phòng..." oninput="update()">
+      </div>
+      <div class="field full">
+        <label>Địa điểm lắp đặt *</label>
+        <input id="diaDiemLapDat" type="text" placeholder="Số nhà, Đường, Tỉnh/TP" oninput="update()">
       </div>
     </div>
-
-    <!-- Thông số kỹ thuật -->
-    <div class="card">
-      <div class="card-header">
-        <span class="icon">⚙️</span>
-        <h3>Thông Số Kỹ Thuật</h3>
-      </div>
-      <div class="card-body">
-
-        <div class="form-group" style="margin-bottom:20px">
-          <label>Tải trọng (Sức chứa)</label>
-          <div class="range-wrap">
-            <div class="range-value" id="capacityVal">500 <span class="range-unit">kg</span></div>
-            <input type="range" id="capacity" min="150" max="2000" step="50" value="500"
-              oninput="updateRange(this,'capacityVal',' kg'); calculate()"
-              style="--val: 24%">
-            <div class="range-labels"><span>150 kg</span><span>500 kg</span><span>1000 kg</span><span>2000 kg</span></div>
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-bottom:20px">
-          <label>Số tầng dừng</label>
-          <div class="range-wrap">
-            <div class="range-value" id="floorsVal">5 <span class="range-unit">tầng</span></div>
-            <input type="range" id="floors" min="2" max="50" step="1" value="5"
-              oninput="updateRange(this,'floorsVal',' tầng'); calculate()"
-              style="--val: 6%">
-            <div class="range-labels"><span>2</span><span>10</span><span>20</span><span>30</span><span>50</span></div>
-          </div>
-        </div>
-
-        <div class="form-group" style="margin-bottom:20px">
-          <label>Tốc độ thang</label>
-          <div class="range-wrap">
-            <div class="range-value" id="speedVal">1.0 <span class="range-unit">m/s</span></div>
-            <input type="range" id="speed" min="0.5" max="4.0" step="0.25" value="1.0"
-              oninput="updateRangeFixed(this,'speedVal',' m/s',2); calculate()"
-              style="--val: 14%">
-            <div class="range-labels"><span>0.5 m/s</span><span>1.5 m/s</span><span>2.5 m/s</span><span>4.0 m/s</span></div>
-          </div>
-        </div>
-
-        <div class="form-grid">
-          <div class="form-group">
-            <label>Vật liệu cabin</label>
-            <select id="cabinMaterial" onchange="calculate()">
-              <option value="0" data-add="0">Inox mờ (Tiêu chuẩn)</option>
-              <option value="1" data-add="20000000">Inox gương (+20 tr)</option>
-              <option value="2" data-add="35000000">Inox + Kính cường lực (+35 tr)</option>
-              <option value="3" data-add="50000000">Toàn kính Panoramic (+50 tr)</option>
-              <option value="4" data-add="15000000">Sơn tĩnh điện cao cấp (+15 tr)</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label>Chiết khấu (%)</label>
-            <input type="number" id="discountPct" value="0" min="0" max="30" step="1" onchange="calculate()" placeholder="0-30%">
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Tính năng thêm -->
-    <div class="card">
-      <div class="card-header">
-        <span class="icon">✨</span>
-        <h3>Tính Năng & Phụ Kiện</h3>
-      </div>
-      <div class="card-body">
-        <div class="feature-grid">
-          <label class="feature-item">
-            <input type="checkbox" value="8000000" data-name="Biến tần tiết kiệm điện" onchange="calculate()" checked>
-            <span>⚡ Biến tần tiết kiệm điện</span>
-            <span class="cost">+8tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="5000000" data-name="Màn hình LCD hiển thị tầng" onchange="calculate()" checked>
-            <span>📺 Màn hình LCD tầng</span>
-            <span class="cost">+5tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="6000000" data-name="Camera quan sát trong cabin" onchange="calculate()">
-            <span>📷 Camera quan sát</span>
-            <span class="cost">+6tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="12000000" data-name="Hệ thống ARD cứu hộ tự động" onchange="calculate()" checked>
-            <span>🚨 ARD cứu hộ tự động</span>
-            <span class="cost">+12tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="3000000" data-name="Chiếu sáng LED cabin" onchange="calculate()" checked>
-            <span>💡 Chiếu sáng LED</span>
-            <span class="cost">+3tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="10000000" data-name="Điều khiển bằng thẻ từ" onchange="calculate()">
-            <span>🔑 Điều khiển thẻ từ</span>
-            <span class="cost">+10tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="15000000" data-name="Kết nối điện thoại thông minh" onchange="calculate()">
-            <span>📱 Smart phone control</span>
-            <span class="cost">+15tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="7000000" data-name="Sàn đá granite nhân tạo" onchange="calculate()">
-            <span>🪨 Sàn đá granite</span>
-            <span class="cost">+7tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="4000000" data-name="Gương trang trí cabin" onchange="calculate()">
-            <span>🪞 Gương trang trí</span>
-            <span class="cost">+4tr</span>
-          </label>
-          <label class="feature-item">
-            <input type="checkbox" value="20000000" data-name="Hệ thống chống động đất" onchange="calculate()">
-            <span>🌏 Chống động đất</span>
-            <span class="cost">+20tr</span>
-          </label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Thông tin khách hàng -->
-    <div class="card">
-      <div class="card-header">
-        <span class="icon">👤</span>
-        <h3>Thông Tin Khách Hàng & Hợp Đồng</h3>
-      </div>
-      <div class="card-body">
-        <div class="form-grid">
-          <div class="form-group full">
-            <label>Tên khách hàng / Công ty</label>
-            <input type="text" id="customerName" placeholder="Công ty TNHH XYZ hoặc Ông/Bà Nguyễn Văn A">
-          </div>
-          <div class="form-group full">
-            <label>Địa chỉ</label>
-            <input type="text" id="customerAddress" placeholder="Số nhà, Đường, Quận/Huyện, Tỉnh/TP">
-          </div>
-          <div class="form-group">
-            <label>Điện thoại</label>
-            <input type="text" id="customerPhone" placeholder="0912 345 678">
-          </div>
-          <div class="form-group">
-            <label>Mã số thuế (nếu có)</label>
-            <input type="text" id="customerTaxCode" placeholder="0100000000">
-          </div>
-          <div class="form-group full">
-            <label>Người đại diện ký hợp đồng</label>
-            <input type="text" id="customerRep" placeholder="Ông/Bà ... - Chức vụ">
-          </div>
-
-          <div class="section-divider" style="grid-column:1/-1"></div>
-
-          <div class="form-group">
-            <label>Số hợp đồng</label>
-            <input type="text" id="contractNumber" value="VEC/2025/001">
-          </div>
-          <div class="form-group">
-            <label>Ngày hợp đồng</label>
-            <input type="text" id="contractDate" id="contractDate">
-          </div>
-          <div class="form-group">
-            <label>Thời gian lắp đặt (ngày)</label>
-            <input type="number" id="deliveryDays" value="45">
-          </div>
-          <div class="form-group">
-            <label>Bảo hành (tháng)</label>
-            <input type="number" id="warrantyMonths" value="24">
-          </div>
-          <div class="form-group">
-            <label>Bảo trì miễn phí (tháng)</label>
-            <input type="number" id="maintenanceMonths" value="12">
-          </div>
-          <div class="form-group">
-            <label>Người lập / Kinh doanh</label>
-            <input type="text" id="salesPerson" placeholder="Nguyễn Thị B">
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </div>
-
-  <!-- Right: Price summary -->
-  <div class="price-panel">
-    <div class="price-card">
-      <h3>Báo Giá Chi Tiết</h3>
-      <p class="subtitle">Cập nhật theo thời gian thực</p>
-
-      <div class="price-row">
-        <span class="label">🏗️ Thiết bị thang máy</span>
-        <span class="value" id="s-base">200,000,000 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">📐 Theo tầng & tải trọng</span>
-        <span class="value" id="s-spec">0 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">🚪 Cửa & vật liệu</span>
-        <span class="value" id="s-material">0 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">✨ Tính năng thêm</span>
-        <span class="value" id="s-features">26,000,000 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">🔧 Lắp đặt & vận hành thử</span>
-        <span class="value" id="s-install">35,000,000 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">🛠️ Bảo trì (12 tháng)</span>
-        <span class="value" id="s-maintenance">18,000,000 VNĐ</span>
-      </div>
-      <div class="price-row" id="discount-row" style="display:none">
-        <span class="label">🎁 Chiết khấu</span>
-        <span class="value discount" id="s-discount">- 0 VNĐ</span>
-      </div>
-
-      <div class="price-row" style="padding-top:12px; margin-top:4px; border-top:1px solid rgba(255,255,255,0.1)">
-        <span class="label">Tạm tính (chưa VAT)</span>
-        <span class="value" id="s-subtotal">279,000,000 VNĐ</span>
-      </div>
-      <div class="price-row">
-        <span class="label">VAT 10%</span>
-        <span class="value" id="s-vat">27,900,000 VNĐ</span>
-      </div>
-
-      <div class="price-row total-row">
-        <span class="label">💎 TỔNG GIÁ TRỊ</span>
-        <span class="value" id="s-total">306,900,000 VNĐ</span>
-      </div>
-
-      <div class="payment-schedule">
-        <h4>Lịch thanh toán đề xuất</h4>
-        <div class="payment-item">
-          <div class="dot"></div>
-          <span class="cond">Ký hợp đồng (30%)</span>
-          <span class="amt" id="p1">92,070,000</span>
-        </div>
-        <div class="payment-item">
-          <div class="dot"></div>
-          <span class="cond">Giao hàng (40%)</span>
-          <span class="amt" id="p2">122,760,000</span>
-        </div>
-        <div class="payment-item">
-          <div class="dot"></div>
-          <span class="cond">Lắp xong (25%)</span>
-          <span class="amt" id="p3">76,725,000</span>
-        </div>
-        <div class="payment-item">
-          <div class="dot"></div>
-          <span class="cond">Sau nghiệm thu (5%)</span>
-          <span class="amt" id="p4">15,345,000</span>
-        </div>
-      </div>
-    </div>
-
-    <button class="btn btn-primary" id="btnExport" onclick="exportWordContract()">
-      📄 Xuất Hợp Đồng Word (.docx)
-    </button>
-    <button class="btn btn-outline" onclick="resetForm()">
-      🔄 Làm Mới
-    </button>
   </div>
 </div>
 
-<div class="toast" id="toast">✅ Đã copy!</div>
+<!-- THÔNG SỐ KỸ THUẬT -->
+<div class="card">
+  <div class="card-head"><span>⚙️</span><h3>Thông Số Kỹ Thuật Thang Máy</h3></div>
+  <div class="card-body">
+
+    <!-- Tải trọng -->
+    <div class="field" style="margin-bottom:22px">
+      <label>Tải trọng (kg)</label>
+      <div class="slider-wrap">
+        <div class="slider-val"><span id="vTaiTrong">450</span> <small>kg</small></div>
+        <input type="range" id="taiTrong" min="200" max="2000" step="50" value="450"
+          oninput="slideUpdate(this,'vTaiTrong');calc()">
+        <div class="slider-ticks"><span>200</span><span>450</span><span>750</span><span>1000</span><span>2000</span></div>
+      </div>
+    </div>
+
+    <!-- Số tầng -->
+    <div class="field" style="margin-bottom:22px">
+      <label>Số tầng dừng</label>
+      <div class="slider-wrap">
+        <div class="slider-val"><span id="vSoTang">5</span> <small>tầng</small></div>
+        <input type="range" id="soTang" min="2" max="30" step="1" value="5"
+          oninput="slideUpdate(this,'vSoTang');calc()">
+        <div class="slider-ticks"><span>2</span><span>5</span><span>10</span><span>20</span><span>30</span></div>
+      </div>
+    </div>
+
+    <!-- Kích thước hố thang -->
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="field">
+        <label>Chiều rộng hố thang (mm)</label>
+        <input type="number" id="rongHo" value="1800" min="1000" max="3000" step="50" oninput="calc()">
+        <div class="hint">Thường từ 1400–2200 mm</div>
+      </div>
+      <div class="field">
+        <label>Chiều sâu hố thang (mm)</label>
+        <input type="number" id="sauHo" value="1600" min="1000" max="3000" step="50" oninput="calc()">
+        <div class="hint">Thường từ 1200–2000 mm</div>
+      </div>
+    </div>
+
+    <!-- Cao cabin -->
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="field">
+        <label>Chiều cao cabin (mm)</label>
+        <input type="number" id="caoCabin" value="2300" min="2000" max="2800" step="50" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Chiều cao cửa (mm)</label>
+        <input type="number" id="caoCua" value="2100" min="1800" max="2400" step="50" oninput="calc()">
+      </div>
+    </div>
+
+    <!-- Preview thông số tính toán -->
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin-top:4px">
+      <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📐 Thông số tính toán tự động</div>
+      <div class="specs-grid">
+        <div class="spec-item"><div class="spec-label">Số người</div><div class="spec-val" id="soNguoi">6 người</div></div>
+        <div class="spec-item"><div class="spec-label">Chiều rộng cửa</div><div class="spec-val" id="rongCua">800 mm</div></div>
+        <div class="spec-item"><div class="spec-label">Chiều rộng cabin</div><div class="spec-val" id="rongCabin">1400 mm</div></div>
+        <div class="spec-item"><div class="spec-label">Chiều sâu cabin</div><div class="spec-val" id="sauCabin">1000 mm</div></div>
+        <div class="spec-item"><div class="spec-label">Mã hiệu</div><div class="spec-val" id="maHieu" style="font-size:12px">P6–CO800–60–05stops</div></div>
+        <div class="spec-item"><div class="spec-label">Danh sách tầng</div><div class="spec-val" id="danhSachTang" style="font-size:12px">1,2,3,4,5</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GIÁ & HỢP ĐỒNG -->
+<div class="card">
+  <div class="card-head"><span>💰</span><h3>Bảng Giá Chi Tiết</h3></div>
+  <div class="card-body">
+    <table class="bảng-giá">
+      <thead>
+        <tr>
+          <th>Hạng mục</th>
+          <th style="text-align:center">Đơn vị</th>
+          <th>Thành tiền</th>
+        </tr>
+      </thead>
+      <tbody id="priceRows">
+        <tr><td>Thiết bị thang máy</td><td style="text-align:center">1 bộ</td><td id="r-thietbi">—</td></tr>
+        <tr><td>Phí theo tải trọng</td><td style="text-align:center">—</td><td id="r-taitrong">—</td></tr>
+        <tr><td>Phí theo số tầng</td><td style="text-align:center">—</td><td id="r-tang">—</td></tr>
+        <tr><td>Lắp đặt & vận hành thử</td><td style="text-align:center">Trọn gói</td><td id="r-lapdат">—</td></tr>
+        <tr id="discRow" style="display:none" class="discount"><td>Chiết khấu</td><td></td><td id="r-ck">—</td></tr>
+        <tr class="subtotal"><td colspan="2"><strong>Tổng (chưa VAT)</strong></td><td id="r-sub">—</td></tr>
+        <tr><td>Thuế VAT 10%</td><td></td><td id="r-vat">—</td></tr>
+        <tr class="total"><td colspan="2"><strong>TỔNG GIÁ TRỊ HỢP ĐỒNG</strong></td><td id="r-total">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- HỢP ĐỒNG -->
+<div class="card">
+  <div class="card-head"><span>📋</span><h3>Thông Tin Hợp Đồng</h3></div>
+  <div class="card-body">
+    <div class="grid3">
+      <div class="field">
+        <label>Số hợp đồng</label>
+        <input id="soHopDong" value="001" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Ngày ký</label>
+        <input id="ngayKy" type="text" oninput="update()">
+      </div>
+      <div class="field">
+        <label>Chiết khấu (%)</label>
+        <input id="ckPct" type="number" value="0" min="0" max="50" step="1" oninput="calc()">
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end left -->
+
+<!-- ═══════════════ RIGHT PANEL ═══════════════ -->
+<div class="panel">
+  <div class="summary-card">
+    <h3>Tóm Tắt Báo Giá</h3>
+    <div class="sum-row"><span class="lbl">🏗️ Thiết bị cơ bản</span><span class="val" id="s-base">—</span></div>
+    <div class="sum-row"><span class="lbl">⚖️ Phụ thu tải trọng + tầng</span><span class="val" id="s-extra">—</span></div>
+    <div class="sum-row"><span class="lbl">🔧 Lắp đặt</span><span class="val" id="s-install">—</span></div>
+    <div class="sum-row disc" id="s-ck-row" style="display:none"><span class="lbl">🎁 Chiết khấu</span><span class="val" id="s-ck">—</span></div>
+    <div class="sum-row"><span class="lbl">Tạm tính</span><span class="val" id="s-sub">—</span></div>
+    <div class="sum-row"><span class="lbl">VAT 10%</span><span class="val" id="s-vat">—</span></div>
+    <div class="sum-total">
+      <span class="lbl">💎 TỔNG GIÁ TRỊ</span>
+      <span class="val" id="s-total">—</span>
+    </div>
+    <div class="payment-list">
+      <h4>Lịch thanh toán</h4>
+      <div class="pay-item"><div class="pay-dot"></div><span class="pay-cond">Ký hợp đồng (đặt cọc)</span><span class="pay-amt" id="p1">—</span></div>
+      <div class="pay-item"><div class="pay-dot"></div><span class="pay-cond">Giao hàng đến công trình (80%)</span><span class="pay-amt" id="p2">—</span></div>
+      <div class="pay-item"><div class="pay-dot"></div><span class="pay-cond">Sau nghiệm thu (20%)</span><span class="pay-amt" id="p3">—</span></div>
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="btnExport" onclick="exportContract()">
+    📄 Xuất Hợp Đồng Word (.docx)
+  </button>
+  <button class="btn btn-outline" onclick="resetAll()">
+    🔄 Làm Mới
+  </button>
+</div>
+
+</div><!-- end layout -->
+
+<div class="toast" id="toast"></div>
 
 <script>
-// ============================================================
-// BẢNG GIÁ
-// ============================================================
-const PRICING = {
-  // Giá cơ bản theo loại thang (được set từ elevator-card data-base)
-  installBase: 30000000,     // lắp đặt cơ bản
-  installPerFloor: 500000,   // thêm mỗi tầng
-  maintenancePerMonth: 1500000, // bảo trì/tháng
-  capacityMultiplier: 50000,    // mỗi 100kg thêm
-  speedMultiplier: 15000000,    // mỗi 0.5 m/s thêm
-  floorMultiplier: 3500000,     // mỗi tầng thêm (sau tầng 3)
+// ══════════════════════════════════════════════
+// BẢNG GIÁ CƠ SỞ (VNĐ) - Chỉnh theo thực tế
+// ══════════════════════════════════════════════
+const GIA = {
+  base: 280000000,          // Giá cơ bản (tải 200kg, 2 tầng)
+  perKg: 150000,            // Thêm mỗi 50kg tải trọng
+  perFloor: 8000000,        // Thêm mỗi tầng (từ tầng 3 trở đi)
+  installation: 20000000,   // Phí lắp đặt cố định
+  installPerFloor: 500000,  // Phí lắp đặt thêm mỗi tầng
+  vatRate: 0.10,
+  deposit: 50000000,        // Tiền đặt cọc cố định (đợt 1)
 };
 
-let currentElevatorBase = 200000000;
+// Công thức từ Excel
+function tinhSoNguoi(kg)       { return Math.floor(kg / 70); }
+function tinhRongCua(rongHo)   { return Math.min(800, Math.floor((rongHo - 100) / 200) * 200); }
+function tinhRongCabin(rongHo) { return rongHo - 400; }
+function tinhSauCabin(sauHo)   { return sauHo - 600; }
 
-function selectElevator(el) {
-  document.querySelectorAll('.elev-card').forEach(c => c.classList.remove('active'));
-  el.classList.add('active');
-  currentElevatorBase = parseInt(el.dataset.base);
-  calculate();
+function tinhMaHieu(taiTrong, rongHo, soTang) {
+  const ck = tinhRongCua(rongHo);
+  const stops = String(soTang).padStart(2,'0');
+  // Model code: P + (taiTrong/75 rounded) + CO + ck + 60 + stops
+  const size = taiTrong <= 450 ? 6 : taiTrong <= 630 ? 8 : taiTrong <= 900 ? 10 : 13;
+  return `P${size} \u2013 CO${ck} \u2013 60 \u2013 ${stops}stops`;
 }
 
-function updateRange(el, displayId, suffix) {
-  document.getElementById(displayId).innerHTML =
-    `${parseInt(el.value).toLocaleString('vi-VN')} <span class="range-unit">${suffix.trim()}</span>`;
-  const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
-  const pct = ((val - min) / (max - min) * 100).toFixed(1);
-  el.style.setProperty('--val', pct + '%');
+function tinhDanhSachTang(soTang) {
+  return Array.from({length: soTang}, (_,i) => i+1).join(',');
 }
 
-function updateRangeFixed(el, displayId, suffix, decimals) {
-  document.getElementById(displayId).innerHTML =
-    `${parseFloat(el.value).toFixed(decimals)} <span class="range-unit">${suffix.trim()}</span>`;
-  const min = parseFloat(el.min), max = parseFloat(el.max), val = parseFloat(el.value);
-  const pct = ((val - min) / (max - min) * 100).toFixed(1);
-  el.style.setProperty('--val', pct + '%');
+function tinhCongSuat(taiTrong) {
+  if (taiTrong <= 450) return 4.1;
+  if (taiTrong <= 630) return 5.5;
+  if (taiTrong <= 900) return 7.5;
+  return 11.0;
 }
 
-function fmt(n) {
-  return Math.round(n).toLocaleString('vi-VN') + ' VNĐ';
+function tinhSoSoi(taiTrong) {
+  return taiTrong <= 630 ? 5 : taiTrong <= 1200 ? 6 : 8;
 }
 
-function calculate() {
-  const capacity = parseInt(document.getElementById('capacity').value);
-  const floors = parseInt(document.getElementById('floors').value);
-  const speed = parseFloat(document.getElementById('speed').value);
-  const discountPct = parseFloat(document.getElementById('discountPct').value) || 0;
-  const maintenanceMonths = parseInt(document.getElementById('maintenanceMonths').value) || 12;
+function fmt(n) { return Math.round(n).toLocaleString('vi-VN') + ' VNĐ'; }
+function fmtShort(n) { return Math.round(n).toLocaleString('vi-VN'); }
 
-  // Door cost
-  const doorSel = document.getElementById('doorType');
-  const doorAdd = parseInt(doorSel.options[doorSel.selectedIndex].dataset.add) || 0;
+// ── SLIDE UPDATE ──
+function slideUpdate(el, displayId) {
+  const v = parseInt(el.value);
+  document.getElementById(displayId).textContent = v.toLocaleString('vi-VN');
+  const min = parseFloat(el.min), max = parseFloat(el.max);
+  const pct = ((v - min) / (max - min) * 100).toFixed(1);
+  el.style.setProperty('--pct', pct + '%');
+}
 
-  // Cabin material cost
-  const cabinSel = document.getElementById('cabinMaterial');
-  const cabinAdd = parseInt(cabinSel.options[cabinSel.selectedIndex].dataset.add) || 0;
+// ── MAIN CALCULATE ──
+function calc() {
+  const taiTrong = parseInt(document.getElementById('taiTrong').value);
+  const soTang   = parseInt(document.getElementById('soTang').value);
+  const rongHo   = parseInt(document.getElementById('rongHo').value) || 1800;
+  const sauHo    = parseInt(document.getElementById('sauHo').value)  || 1600;
+  const caoCabin = parseInt(document.getElementById('caoCabin').value) || 2300;
+  const caoCua   = parseInt(document.getElementById('caoCua').value)   || 2100;
+  const ckPct    = parseFloat(document.getElementById('ckPct').value)  || 0;
 
-  // Features cost
-  let featuresAdd = 0;
-  document.querySelectorAll('.feature-item input[type="checkbox"]:checked').forEach(cb => {
-    featuresAdd += parseInt(cb.value);
-  });
+  // Computed specs (from Excel formulas)
+  const soNguoi   = tinhSoNguoi(taiTrong);
+  const rongCua   = tinhRongCua(rongHo);
+  const rongCabin = tinhRongCabin(rongHo);
+  const sauCabin  = tinhSauCabin(sauHo);
+  const maHieu    = tinhMaHieu(taiTrong, rongHo, soTang);
+  const danhSachTang = tinhDanhSachTang(soTang);
+  const congSuat  = tinhCongSuat(taiTrong);
+  const soSoi     = tinhSoSoi(taiTrong);
 
-  // Spec adjustments
-  const capacityAdd = Math.max(0, (capacity - 500) / 100) * PRICING.capacityMultiplier;
-  const floorsAdd = Math.max(0, floors - 3) * PRICING.floorMultiplier;
-  const speedAdd = Math.max(0, (speed - 1.0) / 0.5) * PRICING.speedMultiplier;
-  const specAdd = capacityAdd + floorsAdd + speedAdd;
+  // Update spec preview
+  document.getElementById('soNguoi').textContent   = soNguoi + ' người';
+  document.getElementById('rongCua').textContent   = rongCua + ' mm';
+  document.getElementById('rongCabin').textContent = rongCabin + ' mm';
+  document.getElementById('sauCabin').textContent  = sauCabin + ' mm';
+  document.getElementById('maHieu').textContent    = maHieu;
+  document.getElementById('danhSachTang').textContent = danhSachTang;
 
-  // Installation
-  const installFee = PRICING.installBase + floors * PRICING.installPerFloor;
+  // Price calculation
+  const extraKg    = Math.max(0, (taiTrong - 200) / 50) * GIA.perKg;
+  const extraFloor = Math.max(0, soTang - 2) * GIA.perFloor;
+  const installFee = GIA.installation + soTang * GIA.installPerFloor;
+  const subtotalBefore = GIA.base + extraKg + extraFloor + installFee;
+  const discount   = Math.round(subtotalBefore * ckPct / 100);
+  const subtotal   = subtotalBefore - discount;
+  const vat        = Math.round(subtotal * GIA.vatRate);
+  const total      = subtotal + vat;
 
-  // Maintenance
-  const maintenanceFee = PRICING.maintenancePerMonth * maintenanceMonths;
+  // Đợt 1: cọc cố định 50tr, đợt 2: 80% - cọc, đợt 3: 20%
+  const dot1 = GIA.deposit;
+  const dot2 = Math.round(total * 0.80) - dot1;
+  const dot3 = total - dot1 - dot2;
 
-  // Material (door + cabin)
-  const materialAdd = doorAdd + cabinAdd;
+  // Update table rows
+  document.getElementById('r-thietbi').textContent = fmt(GIA.base);
+  document.getElementById('r-taitrong').textContent = extraKg > 0 ? fmt(extraKg) : '—';
+  document.getElementById('r-tang').textContent = extraFloor > 0 ? fmt(extraFloor) : '—';
+  document.getElementById('r-lapdат').textContent = fmt(installFee);
+  document.getElementById('r-sub').textContent = fmt(subtotal);
+  document.getElementById('r-vat').textContent = fmt(vat);
+  document.getElementById('r-total').textContent = fmt(total);
 
-  // Base price
-  const basePrice = currentElevatorBase + specAdd + materialAdd + featuresAdd;
-
-  // Subtotal before discount
-  const subBeforeDiscount = basePrice + installFee + maintenanceFee;
-  const discountAmt = Math.round(subBeforeDiscount * discountPct / 100);
-  const subtotal = subBeforeDiscount - discountAmt;
-  const vat = Math.round(subtotal * 0.1);
-  const total = subtotal + vat;
-
-  // Update display
-  document.getElementById('s-base').textContent = fmt(currentElevatorBase);
-  document.getElementById('s-spec').textContent = fmt(specAdd);
-  document.getElementById('s-material').textContent = fmt(materialAdd);
-  document.getElementById('s-features').textContent = fmt(featuresAdd);
-  document.getElementById('s-install').textContent = fmt(installFee);
-  document.getElementById('s-maintenance').textContent = fmt(maintenanceFee);
-  document.getElementById('s-subtotal').textContent = fmt(subtotal);
-  document.getElementById('s-vat').textContent = fmt(vat);
-  document.getElementById('s-total').textContent = fmt(total);
-
-  if (discountAmt > 0) {
-    document.getElementById('discount-row').style.display = 'flex';
-    document.getElementById('s-discount').textContent = `- ${fmt(discountAmt)}`;
+  if (discount > 0) {
+    document.getElementById('discRow').style.display = '';
+    document.getElementById('r-ck').textContent = '- ' + fmt(discount);
+    document.getElementById('s-ck-row').style.display = '';
+    document.getElementById('s-ck').textContent = '- ' + fmt(discount);
   } else {
-    document.getElementById('discount-row').style.display = 'none';
+    document.getElementById('discRow').style.display = 'none';
+    document.getElementById('s-ck-row').style.display = 'none';
   }
 
-  // Payment schedule
-  document.getElementById('p1').textContent = Math.round(total * 0.30).toLocaleString('vi-VN');
-  document.getElementById('p2').textContent = Math.round(total * 0.40).toLocaleString('vi-VN');
-  document.getElementById('p3').textContent = Math.round(total * 0.25).toLocaleString('vi-VN');
-  document.getElementById('p4').textContent = Math.round(total * 0.05).toLocaleString('vi-VN');
+  // Update summary panel
+  document.getElementById('s-base').textContent   = fmt(GIA.base);
+  document.getElementById('s-extra').textContent  = fmt(extraKg + extraFloor);
+  document.getElementById('s-install').textContent= fmt(installFee);
+  document.getElementById('s-sub').textContent    = fmt(subtotal);
+  document.getElementById('s-vat').textContent    = fmt(vat);
+  document.getElementById('s-total').textContent  = fmt(total);
+
+  document.getElementById('p1').textContent = fmtShort(dot1);
+  document.getElementById('p2').textContent = fmtShort(dot2);
+  document.getElementById('p3').textContent = fmtShort(dot3);
 
   // Store for export
-  window._calc = { basePrice, specAdd, materialAdd, featuresAdd, installFee, maintenanceFee, discountAmt, subtotal, vat, total };
-}
-
-function getContractData() {
-  const c = window._calc;
-  const capacity = parseInt(document.getElementById('capacity').value);
-  const floors = parseInt(document.getElementById('floors').value);
-  const speed = parseFloat(document.getElementById('speed').value);
-  const maintenanceMonths = parseInt(document.getElementById('maintenanceMonths').value) || 12;
-
-  const elevCard = document.querySelector('.elev-card.active');
-  const elevType = elevCard.querySelector('.name').textContent;
-  const doorSel = document.getElementById('doorType');
-  const cabinSel = document.getElementById('cabinMaterial');
-  const features = Array.from(document.querySelectorAll('.feature-item input:checked')).map(cb => cb.dataset.name);
-
-  const total = c.total;
-
-  return {
-    customerName: document.getElementById('customerName').value || 'Khách hàng',
-    customerAddress: document.getElementById('customerAddress').value || 'Chưa nhập',
-    customerPhone: document.getElementById('customerPhone').value || 'Chưa nhập',
-    customerTaxCode: document.getElementById('customerTaxCode').value,
-    customerRepresentative: document.getElementById('customerRep').value,
-
-    elevatorType: elevType,
-    elevatorModel: document.getElementById('elevModel').value,
-    capacity, floors, speed,
-    doorType: doorSel.options[doorSel.selectedIndex].text.split(' (+')[0],
-    cabinMaterial: cabinSel.options[cabinSel.selectedIndex].text.split(' (+')[0],
-    features: features.length ? features : ['Tiêu chuẩn'],
-
-    basePrice: Math.round(c.basePrice),
-    installationFee: Math.round(c.installFee || c.specAdd),
-    maintenanceFee: Math.round(c.maintenanceFee),
-    discount: Math.round(c.discountAmt),
-    totalPrice: Math.round(c.subtotal),
-    vatAmount: Math.round(c.vat),
-    grandTotal: Math.round(total),
-    paymentSchedule: [
-      { percent: 30, amount: Math.round(total * 0.30), condition: 'Khi ký kết hợp đồng' },
-      { percent: 40, amount: Math.round(total * 0.40), condition: 'Khi giao hàng đến công trình' },
-      { percent: 25, amount: Math.round(total * 0.25), condition: 'Khi lắp đặt hoàn thiện' },
-      { percent: 5,  amount: Math.round(total * 0.05), condition: 'Sau nghiệm thu 30 ngày' },
-    ],
-
-    contractNumber: document.getElementById('contractNumber').value,
-    contractDate: document.getElementById('contractDate').value,
-    deliveryDays: parseInt(document.getElementById('deliveryDays').value) || 45,
-    warrantyMonths: parseInt(document.getElementById('warrantyMonths').value) || 24,
-    maintenanceMonths,
-
-    salesPerson: document.getElementById('salesPerson').value || 'Nhân viên kinh doanh',
-    salesPhone: '0912.345.678',
+  window._data = {
+    taiTrong, soTang, rongHo, sauHo, caoCabin, caoCua,
+    soNguoi, rongCua, rongCabin, sauCabin,
+    maHieu, danhSachTang, congSuat, soSoi,
+    extraKg, extraFloor, installFee, discount, subtotal, vat, total,
+    dot1, dot2, dot3,
   };
 }
 
-async function exportWordContract() {
+function update() { /* triggers re-read from inputs */ }
+
+// ── SỐ THÀNH CHỮ ──
+function soThanhChu(so) {
+  const dvDon = ['','một','hai','ba','bốn','năm','sáu','bảy','tám','chín'];
+  const dvChuc = ['','mười','hai mươi','ba mươi','bốn mươi','năm mươi','sáu mươi','bảy mươi','tám mươi','chín mươi'];
+  if (so === 0) return 'không';
+  if (so < 10) return dvDon[so];
+  if (so < 100) {
+    const c = Math.floor(so/10), d = so%10;
+    return dvChuc[c] + (d > 0 ? (c===1 && d===1 ? ' một' : ' ' + dvDon[d]) : '');
+  }
+  if (so < 1000) {
+    const tr = Math.floor(so/100), rem = so%100;
+    return dvDon[tr] + ' trăm' + (rem > 0 ? (rem < 10 ? ' linh ' + dvDon[rem] : ' ' + soThanhChu(rem)) : '');
+  }
+  if (so < 1000000) {
+    const ng = Math.floor(so/1000), rem = so%1000;
+    return soThanhChu(ng) + ' nghìn' + (rem > 0 ? (rem < 100 ? ' không trăm ' + soThanhChu(rem) : ' ' + soThanhChu(rem)) : '');
+  }
+  if (so < 1000000000) {
+    const tr = Math.floor(so/1000000), rem = so%1000000;
+    return soThanhChu(tr) + ' triệu' + (rem > 0 ? (rem < 1000 ? ' không nghìn ' + soThanhChu(rem) : ' ' + soThanhChu(rem)) : '');
+  }
+  const ty = Math.floor(so/1000000000), rem = so%1000000000;
+  return soThanhChu(ty) + ' tỷ' + (rem > 0 ? ' ' + soThanhChu(rem) : '');
+}
+
+function formatBangChu(n) {
+  const s = soThanhChu(Math.round(n));
+  return s.charAt(0).toUpperCase() + s.slice(1) + ' đồng chẵn./.';
+}
+
+// ── EXPORT CONTRACT ──
+async function exportContract() {
   const btn = document.getElementById('btnExport');
+
+  // Validate required fields
+  const required = ['tenKhach','diaChi','dienThoai','tenCongTrinh','diaDiemLapDat'];
+  const labels = ['Tên khách hàng','Địa chỉ','Điện thoại','Tên công trình','Địa điểm lắp đặt'];
+  for (let i=0; i<required.length; i++) {
+    if (!document.getElementById(required[i]).value.trim()) {
+      showToast('⚠️ Vui lòng nhập: ' + labels[i], 'error');
+      return;
+    }
+  }
+
   btn.textContent = '⏳ Đang tạo hợp đồng...';
   btn.disabled = true;
 
   try {
-    // Kiểm tra thư viện đã load chưa
-    if (typeof window.docx === 'undefined') {
-      throw new Error('Thư viện docx chưa load xong, vui lòng thử lại sau vài giây.');
-    }
+    const d = window._data;
+    const ngayKy = document.getElementById('ngayKy').value || '';
+    const parts = ngayKy.split('/');
+    const ngay  = parts[0] || new Date().getDate().toString().padStart(2,'0');
+    const thang = parts[1] || String(new Date().getMonth()+1).padStart(2,'0');
+    const nam   = parts[2] || new Date().getFullYear().toString();
 
-    const data = getContractData();
-    const {
-      Document, Packer, Paragraph, TextRun, Table, TableRow, TableCell,
-      AlignmentType, BorderStyle, WidthType, ShadingType, VerticalAlign
-    } = window.docx;
+    const data = {
+      SO_HOP_DONG:      document.getElementById('soHopDong').value || '001',
+      NGAY: ngay, THANG: thang, NAM: nam,
+      TEN_KHACH_HANG:   document.getElementById('tenKhach').value,
+      NGUOI_DAI_DIEN:   document.getElementById('nguoiDaiDien').value || document.getElementById('tenKhach').value,
+      DIA_CHI:          document.getElementById('diaChi').value,
+      DIEN_THOAI:       document.getElementById('dienThoai').value,
+      CCCD:             document.getElementById('cccd').value || '…………………………………………..',
+      TEN_CONG_TRINH:   document.getElementById('tenCongTrinh').value,
+      DIA_DIEM_LAP_DAT: document.getElementById('diaDiemLapDat').value,
+      TAI_TRONG:        String(d.taiTrong),
+      SO_TANG:          String(d.soTang).padStart(2,'0'),
+      SO_TANG_STOPS:    String(d.soTang).padStart(2,'0'),
+      DANH_SACH_TANG:   d.danhSachTang,
+      MA_HIEU:          d.maHieu,
+      DON_GIA:          d.total.toLocaleString('vi-VN'),
+      GIA_TRI_BANG_CHU: formatBangChu(d.total),
+      RONG_HO:          String(d.rongHo),
+      SAU_HO:           String(d.sauHo),
+      RONG_CABIN:       String(d.rongCabin),
+      SAU_CABIN:        String(d.sauCabin),
+      CAO_CABIN:        String(d.caoCabin),
+      RONG_CUA:         String(d.rongCua),
+      CAO_CUA:          String(d.caoCua),
+      CONG_SUAT:        String(d.congSuat),
+      SO_SOI:           String(d.soSoi),
+    };
 
-    const fmtCur = n => Math.round(n).toLocaleString('vi-VN') + ' VNĐ';
+    // Load template file
+    const resp = await fetch('hop_dong_template.docx');
+    if (!resp.ok) throw new Error('Không tải được file template. Hãy đảm bảo file hop_dong_template.docx có trong cùng thư mục.');
+    const arrayBuf = await resp.arrayBuffer();
 
-    const NAVY = '0D1B3E', NAVY2 = '1A2F5E', GOLD = 'C9A84C', WHITE = 'FFFFFF';
-    const border = { style: BorderStyle.SINGLE, size: 1, color: 'AAAAAA' };
-    const borders = { top: border, bottom: border, left: border, right: border };
+    const zip = new PizZip(arrayBuf);
+    const doc = new window.docxtemplater(zip, { paragraphLoop: true, linebreaks: true });
+    doc.render(data);
 
-    const mkCell = (text, opts = {}) => new TableCell({
-      borders,
-      width: opts.w ? { size: opts.w, type: WidthType.DXA } : undefined,
-      shading: opts.bg ? { fill: opts.bg, type: ShadingType.CLEAR } : undefined,
-      margins: { top: 80, bottom: 80, left: 120, right: 120 },
-      verticalAlign: VerticalAlign.CENTER,
-      children: [new Paragraph({
-        alignment: opts.align || AlignmentType.LEFT,
-        children: [new TextRun({
-          text: String(text ?? ''),
-          bold: opts.bold || false,
-          size: opts.size || 20,
-          font: 'Times New Roman',
-          color: opts.color || '000000',
-        })]
-      })]
-    });
-
-    const mkP = (text, opts = {}) => new Paragraph({
-      alignment: opts.align || AlignmentType.LEFT,
-      spacing: { before: opts.before || 60, after: opts.after || 60 },
-      border: opts.borderBottom ? { bottom: { style: BorderStyle.SINGLE, size: 6, color: NAVY2, space: 1 } } : undefined,
-      children: [new TextRun({
-        text: String(text ?? ''),
-        bold: opts.bold || false,
-        italics: opts.italic || false,
-        size: opts.size || 22,
-        font: 'Times New Roman',
-        color: opts.color || '000000',
-        allCaps: opts.caps || false,
-      })]
-    });
-
-    const secTitle = (text) => [
-      mkP(text, { bold: true, size: 24, color: NAVY2, caps: true, before: 200, after: 0 }),
-      mkP('', { borderBottom: true, before: 0, after: 120 }),
-    ];
-
-    // ── HEADER ──
-    const header = [
-      mkP('CÔNG TY CỔ PHẦN THANG MÁY VIỆT NAM', { bold: true, size: 30, color: NAVY, align: AlignmentType.CENTER, before: 0, after: 40 }),
-      mkP('VIETNAM ELEVATOR CORPORATION', { bold: true, size: 20, color: NAVY2, align: AlignmentType.CENTER, after: 40 }),
-      mkP('Địa chỉ: Số 123, Đường Nguyễn Văn Linh, TP. Hà Nội  |  Tel: 024.1234.5678', { size: 18, color: '555555', align: AlignmentType.CENTER, after: 60 }),
-      mkP('', { borderBottom: true, before: 0, after: 160 }),
-      mkP('HỢP ĐỒNG CUNG CẤP VÀ LẮP ĐẶT THANG MÁY', { bold: true, size: 28, color: NAVY, align: AlignmentType.CENTER, before: 0, after: 60 }),
-      mkP(`Số hợp đồng: ${data.contractNumber}`, { bold: true, size: 22, align: AlignmentType.CENTER, after: 40 }),
-      mkP(`Ngày: ${data.contractDate}`, { size: 20, italic: true, align: AlignmentType.CENTER, after: 200 }),
-    ];
-
-    // ── ĐIỀU 1: CÁC BÊN ──
-    const parties = [
-      ...secTitle('Điều 1: Các Bên Tham Gia Hợp Đồng'),
-      mkP('BÊN A (BÊN CUNG CẤP & LẮP ĐẶT):', { bold: true, color: NAVY2 }),
-      mkP('Công ty Cổ phần Thang Máy Việt Nam', { bold: true }),
-      mkP('Địa chỉ: Số 123, Đường Nguyễn Văn Linh, Quận Hoàng Mai, TP. Hà Nội'),
-      mkP('Mã số thuế: 0123456789  |  Đại diện: Ông Nguyễn Văn A - Giám đốc'),
-      mkP('Điện thoại: 024.1234.5678  |  Email: info@thangmayvn.com'),
-      mkP(''),
-      mkP('BÊN B (BÊN MUA):', { bold: true, color: NAVY2 }),
-      mkP(`Tên khách hàng / Công ty: ${data.customerName}`, { bold: true }),
-      mkP(`Địa chỉ: ${data.customerAddress}`),
-      ...(data.customerTaxCode ? [mkP(`Mã số thuế: ${data.customerTaxCode}`)] : []),
-      ...(data.customerRepresentative ? [mkP(`Đại diện: ${data.customerRepresentative}`)] : []),
-      mkP(`Điện thoại: ${data.customerPhone}`),
-      mkP(''),
-      mkP('Hai bên thống nhất ký kết hợp đồng với các điều khoản sau:', { italic: true }),
-      mkP(''),
-    ];
-
-    // ── ĐIỀU 2: THÔNG SỐ KỸ THUẬT ──
-    const specTable = new Table({
-      width: { size: 9200, type: WidthType.DXA },
-      columnWidths: [3400, 5800],
-      rows: [
-        new TableRow({ children: [mkCell('THÔNG SỐ KỸ THUẬT THANG MÁY', { w: 9200, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }), mkCell('', { w: 0 })] }),
-        new TableRow({ children: [mkCell('Loại thang máy', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.elevatorType, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Model / Nhãn hiệu', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.elevatorModel, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Tải trọng', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.capacity} kg`, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Số tầng dừng', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.floors} tầng`, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Tốc độ thang', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(`${data.speed} m/s`, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Loại cửa', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.doorType, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Vật liệu cabin', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.cabinMaterial, { w: 5800 })] }),
-        new TableRow({ children: [mkCell('Tính năng đặc biệt', { w: 3400, bg: 'DEEAF1', bold: true }), mkCell(data.features.join(', '), { w: 5800 })] }),
-      ]
-    });
-
-    const specs = [
-      ...secTitle('Điều 2: Thông Số Kỹ Thuật Thang Máy'),
-      specTable,
-      mkP(''),
-    ];
-
-    // ── ĐIỀU 3: GIÁ ──
-    const priceTable = new Table({
-      width: { size: 9200, type: WidthType.DXA },
-      columnWidths: [4800, 2000, 2400],
-      rows: [
-        new TableRow({ children: [
-          mkCell('HẠNG MỤC', { w: 4800, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
-          mkCell('ĐƠN VỊ', { w: 2000, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
-          mkCell('THÀNH TIỀN', { w: 2400, bg: NAVY2, bold: true, color: WHITE, align: AlignmentType.CENTER }),
-        ]}),
-        new TableRow({ children: [mkCell('Giá thiết bị thang máy', { w: 4800 }), mkCell('1 bộ', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.basePrice), { w: 2400, align: AlignmentType.RIGHT })] }),
-        new TableRow({ children: [mkCell('Chi phí lắp đặt & vận hành thử', { w: 4800 }), mkCell('Trọn gói', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.installationFee), { w: 2400, align: AlignmentType.RIGHT })] }),
-        new TableRow({ children: [mkCell(`Bảo trì định kỳ (${data.maintenanceMonths} tháng)`, { w: 4800 }), mkCell('Trọn gói', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.maintenanceFee), { w: 2400, align: AlignmentType.RIGHT })] }),
-        ...(data.discount > 0 ? [new TableRow({ children: [mkCell('Chiết khấu / Giảm giá', { w: 4800, color: 'C00000' }), mkCell('', { w: 2000 }), mkCell(`- ${fmtCur(data.discount)}`, { w: 2400, color: 'C00000', align: AlignmentType.RIGHT })] })] : []),
-        new TableRow({ children: [mkCell('Tổng cộng (chưa VAT)', { w: 4800, bg: 'DEEAF1', bold: true }), mkCell('', { w: 2000, bg: 'DEEAF1' }), mkCell(fmtCur(data.totalPrice), { w: 2400, bg: 'DEEAF1', bold: true, align: AlignmentType.RIGHT })] }),
-        new TableRow({ children: [mkCell('Thuế VAT (10%)', { w: 4800 }), mkCell('10%', { w: 2000, align: AlignmentType.CENTER }), mkCell(fmtCur(data.vatAmount), { w: 2400, align: AlignmentType.RIGHT })] }),
-        new TableRow({ children: [mkCell('TỔNG GIÁ TRỊ HỢP ĐỒNG', { w: 4800, bg: NAVY2, bold: true, color: WHITE }), mkCell('', { w: 2000, bg: NAVY2 }), mkCell(fmtCur(data.grandTotal), { w: 2400, bg: NAVY2, bold: true, color: 'FFFF00', align: AlignmentType.RIGHT })] }),
-      ]
-    });
-
-    const pricing = [
-      ...secTitle('Điều 3: Giá Trị Hợp Đồng và Phương Thức Thanh Toán'),
-      priceTable,
-      mkP(''),
-      mkP('Phương thức thanh toán:', { bold: true }),
-      ...data.paymentSchedule.map((s, i) => mkP(`  • Đợt ${i + 1}: ${s.percent}% = ${fmtCur(s.amount)} — ${s.condition}`)),
-      mkP(''),
-      mkP('Hình thức: Chuyển khoản — STK: 0123456789 - BIDV - Chi nhánh Hà Nội', { italic: true }),
-      mkP(''),
-    ];
-
-    // ── ĐIỀU 4-6: ĐIỀU KHOẢN ──
-    const terms = [
-      ...secTitle('Điều 4: Thời Gian Thực Hiện'),
-      mkP(`• Thời gian giao hàng và lắp đặt: ${data.deliveryDays} ngày làm việc kể từ ngày ký hợp đồng và nhận đặt cọc.`),
-      mkP(`• Bảo hành thiết bị: ${data.warrantyMonths} tháng kể từ ngày nghiệm thu.`),
-      mkP(`• Bảo trì miễn phí: ${data.maintenanceMonths} tháng đầu, định kỳ theo lịch thỏa thuận.`),
-      mkP(''),
-      ...secTitle('Điều 5: Nghĩa Vụ Các Bên'),
-      mkP('Bên A có trách nhiệm:', { bold: true }),
-      mkP('• Cung cấp thang máy đúng thông số kỹ thuật đã ký kết.'),
-      mkP('• Lắp đặt, vận hành thử và bàn giao đúng thời hạn.'),
-      mkP('• Hỗ trợ kỹ thuật và bảo hành trong suốt thời gian hợp đồng.'),
-      mkP(''),
-      mkP('Bên B có trách nhiệm:', { bold: true }),
-      mkP('• Thanh toán đúng hạn theo lịch đã thỏa thuận.'),
-      mkP('• Chuẩn bị mặt bằng (hố thang, phòng máy) theo bản vẽ kỹ thuật của Bên A.'),
-      mkP('• Không tự ý sửa chữa, thay thế linh kiện trong thời gian bảo hành.'),
-      mkP(''),
-      ...secTitle('Điều 6: Điều Khoản Chung'),
-      mkP('• Hợp đồng có hiệu lực từ ngày ký, có giá trị pháp lý với cả hai bên.'),
-      mkP('• Mọi tranh chấp giải quyết bằng thương lượng, nếu không thỏa thuận được thì đưa ra Tòa án có thẩm quyền tại Hà Nội.'),
-      mkP('• Hợp đồng lập thành 02 bản, mỗi bên giữ 01 bản có giá trị pháp lý như nhau.'),
-      mkP(''),
-    ];
-
-    // ── KÝ KẾT ──
-    const signTable = new Table({
-      width: { size: 9200, type: WidthType.DXA },
-      columnWidths: [4600, 4600],
-      rows: [
-        new TableRow({ children: [
-          mkCell('ĐẠI DIỆN BÊN A', { w: 4600, bold: true, align: AlignmentType.CENTER, bg: 'DEEAF1' }),
-          mkCell('ĐẠI DIỆN BÊN B', { w: 4600, bold: true, align: AlignmentType.CENTER, bg: 'DEEAF1' }),
-        ]}),
-        new TableRow({ children: [
-          mkCell('(Ký, đóng dấu)', { w: 4600, align: AlignmentType.CENTER, italic: true }),
-          mkCell('(Ký, đóng dấu)', { w: 4600, align: AlignmentType.CENTER, italic: true }),
-        ]}),
-        new TableRow({ children: [
-          new TableCell({
-            borders, width: { size: 4600, type: WidthType.DXA },
-            margins: { top: 80, bottom: 80, left: 120, right: 120 },
-            children: [
-              new Paragraph({ spacing: { before: 0, after: 1800 }, children: [new TextRun('')] }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: 'Nguyễn Văn A - Giám đốc', bold: true, font: 'Times New Roman', size: 20 })] }),
-            ]
-          }),
-          new TableCell({
-            borders, width: { size: 4600, type: WidthType.DXA },
-            margins: { top: 80, bottom: 80, left: 120, right: 120 },
-            children: [
-              new Paragraph({ spacing: { before: 0, after: 1800 }, children: [new TextRun('')] }),
-              new Paragraph({ alignment: AlignmentType.CENTER, children: [new TextRun({ text: data.customerRepresentative || data.customerName, bold: true, font: 'Times New Roman', size: 20 })] }),
-            ]
-          }),
-        ]}),
-      ]
-    });
-
-    const signing = [
-      ...secTitle('Chữ Ký Xác Nhận'),
-      mkP(`Hà Nội, ngày ${data.contractDate}`, { align: AlignmentType.RIGHT, italic: true }),
-      mkP(''),
-      signTable,
-      mkP(''),
-      mkP(`Người lập: ${data.salesPerson}  |  ĐT: ${data.salesPhone}`, { italic: true, size: 18, color: '888888' }),
-    ];
-
-    const doc = new Document({
-      styles: {
-        default: { document: { run: { font: 'Times New Roman', size: 22 } } }
-      },
-      sections: [{
-        properties: {
-          page: {
-            size: { width: 11906, height: 16838 },
-            margin: { top: 1134, right: 850, bottom: 1134, left: 1700 }
-          }
-        },
-        children: [...header, ...parties, ...specs, ...pricing, ...terms, ...signing]
-      }]
-    });
-
-    const blob = await Packer.toBlob(doc);
-    const filename = `HopDong_${data.contractNumber.replace(/\//g,'_')}_${data.customerName.replace(/\s+/g,'_')}.docx`;
-    saveAs(blob, filename);
-    showToast('✅ Đã tải hợp đồng Word thành công!');
-
-  } catch (err) {
-    console.error(err);
-    showToast('❌ Lỗi: ' + err.message);
+    const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
+    const soHD = document.getElementById('soHopDong').value || '001';
+    const tenKH = document.getElementById('tenKhach').value.replace(/\s+/g,'_').substring(0,30);
+    saveAs(out, `HopDong_${soHD}_${tenKH}.docx`);
+    showToast('✅ Xuất hợp đồng thành công!');
+  } catch(e) {
+    console.error(e);
+    showToast('❌ Lỗi: ' + e.message, 'error');
   }
-
   btn.textContent = '📄 Xuất Hợp Đồng Word (.docx)';
   btn.disabled = false;
 }
 
-function resetForm() {
-  document.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => {
-    if (!['contractNumber','deliveryDays','warrantyMonths','maintenanceMonths'].includes(i.id)) i.value = '';
+// ── RESET ──
+function resetAll() {
+  document.querySelectorAll('input[type=text],input[type=number]').forEach(el => {
+    if (!['soHopDong','ngayKy','caoCabin','caoCua','rongHo','sauHo'].includes(el.id)) el.value = '';
   });
-  document.querySelectorAll('input[type="checkbox"]').forEach(cb => cb.checked = false);
-  document.getElementById('capacity').value = 500;
-  document.getElementById('floors').value = 5;
-  document.getElementById('speed').value = 1.0;
-  document.getElementById('discountPct').value = 0;
-  updateRange(document.getElementById('capacity'), 'capacityVal', ' kg');
-  updateRange(document.getElementById('floors'), 'floorsVal', ' tầng');
-  updateRangeFixed(document.getElementById('speed'), 'speedVal', ' m/s', 2);
-  calculate();
+  document.getElementById('taiTrong').value = 450;
+  document.getElementById('soTang').value = 5;
+  document.getElementById('ckPct').value = 0;
+  document.getElementById('rongHo').value = 1800;
+  document.getElementById('sauHo').value = 1600;
+  document.getElementById('caoCabin').value = 2300;
+  document.getElementById('caoCua').value = 2100;
+  slideUpdate(document.getElementById('taiTrong'),'vTaiTrong');
+  slideUpdate(document.getElementById('soTang'),'vSoTang');
+  calc();
   showToast('🔄 Đã làm mới!');
 }
 
-function showToast(msg) {
+// ── TOAST ──
+function showToast(msg, type='') {
   const t = document.getElementById('toast');
   t.textContent = msg;
-  t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2800);
+  t.className = 'toast' + (type==='error' ? ' error' : '') + ' show';
+  setTimeout(()=>{ t.classList.remove('show'); }, 3200);
 }
 
-// Set today's date
-const today = new Date();
-const dd = String(today.getDate()).padStart(2,'0');
-const mm = String(today.getMonth()+1).padStart(2,'0');
-const yyyy = today.getFullYear();
-document.getElementById('contractDate').value = `${dd}/${mm}/${yyyy}`;
+// ── INIT ──
+const now = new Date();
+document.getElementById('currentDate').textContent =
+  now.toLocaleDateString('vi-VN', {weekday:'long', day:'2-digit', month:'2-digit', year:'numeric'});
 
-// Initial calculate
-calculate();
+const dd = String(now.getDate()).padStart(2,'0');
+const mm = String(now.getMonth()+1).padStart(2,'0');
+document.getElementById('ngayKy').value = `${dd}/${mm}/${now.getFullYear()}`;
+
+slideUpdate(document.getElementById('taiTrong'),'vTaiTrong');
+slideUpdate(document.getElementById('soTang'),'vSoTang');
+calc();
 </script>
 </body>
 </html>
