@@ -276,13 +276,11 @@ input[type=range]::-webkit-slider-thumb {
 
     <!-- Tải trọng -->
     <div class="field" style="margin-bottom:22px">
-      <label>Tải trọng (kg)</label>
-      <div class="slider-wrap">
-        <div class="slider-val"><span id="vTaiTrong">450</span> <small>kg</small></div>
-        <input type="range" id="taiTrong" min="200" max="2000" step="50" value="450"
-          oninput="slideUpdate(this,'vTaiTrong');calc()">
-        <div class="slider-ticks"><span>200</span><span>450</span><span>750</span><span>1000</span><span>2000</span></div>
-      </div>
+      <label>Tải trọng</label>
+      <select id="taiTrong" onchange="calc()">
+        <option value="450" selected>450 kg</option>
+        <option value="650">650 kg</option>
+      </select>
     </div>
 
     <!-- Số tầng -->
@@ -322,6 +320,28 @@ input[type=range]::-webkit-slider-thumb {
       </div>
     </div>
 
+    <!-- Kích thước cáp & Số sợi cáp -->
+    <div class="grid2" style="margin-bottom:16px">
+      <div class="field">
+        <label>Kích thước cáp tải</label>
+        <select id="kichThuocCap" onchange="calc()">
+          <option value="6">Φ6</option>
+          <option value="8" selected>Φ8</option>
+          <option value="10">Φ10</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Số sợi cáp</label>
+        <select id="soSoi" onchange="calc()">
+          <option value="4">4 sợi</option>
+          <option value="5" selected>5 sợi</option>
+          <option value="6">6 sợi</option>
+          <option value="7">7 sợi</option>
+          <option value="8">8 sợi</option>
+        </select>
+      </div>
+    </div>
+
     <!-- Preview thông số tính toán -->
     <div style="background:var(--bg);border-radius:10px;padding:14px;margin-top:4px">
       <div style="font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">📐 Thông số tính toán tự động</div>
@@ -353,7 +373,7 @@ input[type=range]::-webkit-slider-thumb {
         <tr><td>Thiết bị thang máy</td><td style="text-align:center">1 bộ</td><td id="r-thietbi">—</td></tr>
         <tr><td>Phí theo tải trọng</td><td style="text-align:center">—</td><td id="r-taitrong">—</td></tr>
         <tr><td>Phí theo số tầng</td><td style="text-align:center">—</td><td id="r-tang">—</td></tr>
-        <tr><td>Lắp đặt & vận hành thử</td><td style="text-align:center">Trọn gói</td><td id="r-lapdат">—</td></tr>
+        <tr><td>Lắp đặt & vận hành thử</td><td style="text-align:center">Trọn gói</td><td id="r-lapdat">—</td></tr>
         <tr id="discRow" style="display:none" class="discount"><td>Chiết khấu</td><td></td><td id="r-ck">—</td></tr>
         <tr class="subtotal"><td colspan="2"><strong>Tổng (chưa VAT)</strong></td><td id="r-sub">—</td></tr>
         <tr><td>Thuế VAT 10%</td><td></td><td id="r-vat">—</td></tr>
@@ -459,10 +479,6 @@ function tinhCongSuat(taiTrong) {
   return 11.0;
 }
 
-function tinhSoSoi(taiTrong) {
-  return taiTrong <= 630 ? 5 : taiTrong <= 1200 ? 6 : 8;
-}
-
 function fmt(n) { return Math.round(n).toLocaleString('vi-VN') + ' VNĐ'; }
 function fmtShort(n) { return Math.round(n).toLocaleString('vi-VN'); }
 
@@ -493,7 +509,9 @@ function calc() {
   const maHieu    = tinhMaHieu(taiTrong, rongHo, soTang);
   const danhSachTang = tinhDanhSachTang(soTang);
   const congSuat  = tinhCongSuat(taiTrong);
-  const soSoi     = tinhSoSoi(taiTrong);
+  // User-selected (dropdowns)
+  const kichThuocCap = parseInt(document.getElementById('kichThuocCap').value) || 8;
+  const soSoi        = parseInt(document.getElementById('soSoi').value) || 5;
 
   // Update spec preview
   document.getElementById('soNguoi').textContent   = soNguoi + ' người';
@@ -522,7 +540,7 @@ function calc() {
   document.getElementById('r-thietbi').textContent = fmt(GIA.base);
   document.getElementById('r-taitrong').textContent = extraKg > 0 ? fmt(extraKg) : '—';
   document.getElementById('r-tang').textContent = extraFloor > 0 ? fmt(extraFloor) : '—';
-  document.getElementById('r-lapdат').textContent = fmt(installFee);
+  document.getElementById('r-lapdat').textContent = fmt(installFee);
   document.getElementById('r-sub').textContent = fmt(subtotal);
   document.getElementById('r-vat').textContent = fmt(vat);
   document.getElementById('r-total').textContent = fmt(total);
@@ -553,7 +571,7 @@ function calc() {
   window._data = {
     taiTrong, soTang, rongHo, sauHo, caoCabin, caoCua,
     soNguoi, rongCua, rongCabin, sauCabin,
-    maHieu, danhSachTang, congSuat, soSoi,
+    maHieu, danhSachTang, congSuat, soSoi, kichThuocCap,
     extraKg, extraFloor, installFee, discount, subtotal, vat, total,
     dot1, dot2, dot3,
   };
@@ -643,6 +661,7 @@ async function exportContract() {
       CAO_CUA:          String(d.caoCua),
       CONG_SUAT:        String(d.congSuat),
       SO_SOI:           String(d.soSoi),
+      KICH_THUOC_CAP:   String(d.kichThuocCap),
     };
 
     // Load template file
@@ -672,14 +691,15 @@ function resetAll() {
   document.querySelectorAll('input[type=text],input[type=number]').forEach(el => {
     if (!['soHopDong','ngayKy','caoCabin','caoCua','rongHo','sauHo'].includes(el.id)) el.value = '';
   });
-  document.getElementById('taiTrong').value = 450;
+  document.getElementById('taiTrong').value = '450';
   document.getElementById('soTang').value = 5;
   document.getElementById('ckPct').value = 0;
   document.getElementById('rongHo').value = 1800;
   document.getElementById('sauHo').value = 1600;
   document.getElementById('caoCabin').value = 2300;
   document.getElementById('caoCua').value = 2100;
-  slideUpdate(document.getElementById('taiTrong'),'vTaiTrong');
+  document.getElementById('kichThuocCap').value = '8';
+  document.getElementById('soSoi').value = '5';
   slideUpdate(document.getElementById('soTang'),'vSoTang');
   calc();
   showToast('🔄 Đã làm mới!');
@@ -702,7 +722,6 @@ const dd = String(now.getDate()).padStart(2,'0');
 const mm = String(now.getMonth()+1).padStart(2,'0');
 document.getElementById('ngayKy').value = `${dd}/${mm}/${now.getFullYear()}`;
 
-slideUpdate(document.getElementById('taiTrong'),'vTaiTrong');
 slideUpdate(document.getElementById('soTang'),'vSoTang');
 calc();
 </script>
