@@ -237,15 +237,15 @@ input[type=range]::-webkit-slider-thumb {
   <div class="card-body">
     <div class="grid2">
       <div class="field full">
-        <label>Tên khách hàng / Công ty *</label>
+        <label>Tên khách hàng / Công ty</label>
         <input id="tenKhach" type="text" placeholder="Ông/Bà Nguyễn Văn A hoặc Công ty ABC" oninput="update()">
       </div>
       <div class="field full">
-        <label>Địa chỉ *</label>
+        <label>Địa chỉ</label>
         <input id="diaChi" type="text" placeholder="Số nhà, Đường, Phường/Xã, Tỉnh/TP" oninput="update()">
       </div>
       <div class="field">
-        <label>Điện thoại *</label>
+        <label>Điện thoại</label>
         <input id="dienThoai" type="text" placeholder="0912 345 678" oninput="update()">
       </div>
       <div class="field">
@@ -258,11 +258,11 @@ input[type=range]::-webkit-slider-thumb {
       </div>
       <div class="field full"><div class="divider"></div></div>
       <div class="field full">
-        <label>Tên công trình *</label>
+        <label>Tên công trình</label>
         <input id="tenCongTrinh" type="text" placeholder="Nhà ở gia đình, Tòa nhà văn phòng..." oninput="update()">
       </div>
       <div class="field full">
-        <label>Địa điểm lắp đặt *</label>
+        <label>Địa điểm lắp đặt</label>
         <input id="diaDiemLapDat" type="text" placeholder="Số nhà, Đường, Tỉnh/TP" oninput="update()">
       </div>
     </div>
@@ -614,16 +614,6 @@ function formatBangChu(n) {
 async function exportContract() {
   const btn = document.getElementById('btnExport');
 
-  // Validate required fields
-  const required = ['tenKhach','diaChi','dienThoai','tenCongTrinh','diaDiemLapDat'];
-  const labels = ['Tên khách hàng','Địa chỉ','Điện thoại','Tên công trình','Địa điểm lắp đặt'];
-  for (let i=0; i<required.length; i++) {
-    if (!document.getElementById(required[i]).value.trim()) {
-      showToast('⚠️ Vui lòng nhập: ' + labels[i], 'error');
-      return;
-    }
-  }
-
   btn.textContent = '⏳ Đang tạo hợp đồng...';
   btn.disabled = true;
 
@@ -642,7 +632,7 @@ async function exportContract() {
       NGUOI_DAI_DIEN:   document.getElementById('nguoiDaiDien').value || document.getElementById('tenKhach').value,
       DIA_CHI:          document.getElementById('diaChi').value,
       DIEN_THOAI:       document.getElementById('dienThoai').value,
-      CCCD:             document.getElementById('cccd').value || '…………………………………………..',
+      CCCD:             document.getElementById('cccd').value,
       TEN_CONG_TRINH:   document.getElementById('tenCongTrinh').value,
       DIA_DIEM_LAP_DAT: document.getElementById('diaDiemLapDat').value,
       TAI_TRONG:        String(d.taiTrong),
@@ -675,8 +665,9 @@ async function exportContract() {
 
     const out = doc.getZip().generate({ type: 'blob', mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' });
     const soHD = document.getElementById('soHopDong').value || '001';
-    const tenKH = document.getElementById('tenKhach').value.replace(/\s+/g,'_').substring(0,30);
-    saveAs(out, `HopDong_${soHD}_${tenKH}.docx`);
+    const tenKH = document.getElementById('tenKhach').value.trim().replace(/\s+/g,'_').substring(0,30);
+    const filename = tenKH ? `HopDong_${soHD}_${tenKH}.docx` : `HopDong_${soHD}.docx`;
+    saveAs(out, filename);
     showToast('✅ Xuất hợp đồng thành công!');
   } catch(e) {
     console.error(e);
